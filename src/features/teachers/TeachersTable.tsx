@@ -29,6 +29,7 @@ export default function TeachersTable({ teachers }: TeachersTableProps) {
             <th className="py-3 px-6">Email</th>
             <th className="py-3 px-6">Students</th>
             <th className="py-3 px-6">Supervisor</th>
+            <th className="py-3 px-6">Rating</th>
             <th className="py-3 px-6">Status</th>
           </tr>
         </thead>
@@ -54,6 +55,12 @@ export default function TeachersTable({ teachers }: TeachersTableProps) {
               <td className="py-4 px-6 text-gray-500">{teacher.email}</td>
               <td className="py-4 px-6 text-gray-500">{teacher.students}</td>
               <td className="py-4 px-6 text-gray-500">{teacher.supervisor}</td>
+              <td className="py-4 px-6 text-gray-500">
+                <div className="flex items-center gap-1">
+                  <span className="text-yellow-400">★</span>
+                  <span className="font-medium text-gray-700">{teacher.rating || "N/A"}</span>
+                </div>
+              </td>
               <td className="py-4 px-6">
                 <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-[#EAF3DE] text-[#085041]">
                   {teacher.status}

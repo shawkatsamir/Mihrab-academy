@@ -64,6 +64,21 @@ export default function AddStaffDrawer({
               className="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
             />
           </div>
+
+          {/* Rating */}
+          <div className="space-y-1.5">
+            <label className="text-sm font-medium text-gray-900">
+              Rating
+            </label>
+            <input
+              type="number"
+              min="0"
+              max="5"
+              step="0.1"
+              placeholder="e.g. 4.5"
+              className="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+            />
+          </div>
         </div>
 
         <div className="p-6 border-t border-gray-100">
