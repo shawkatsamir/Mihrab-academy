@@ -52,7 +52,7 @@ export function Sidebar({ role = "admin" }: SidebarProps) {
           name: "Staff",
           icon: Users,
           subItems: [
-            { name: "Teachers", path: "/admin/teachers" },
+            { name: "Teachers", path: "/teachers" },
             { name: "Supervisors", path: "/admin/supervisors" },
             { name: "Admins", path: "/admin/admins" },
           ],
