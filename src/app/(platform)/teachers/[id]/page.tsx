@@ -36,19 +36,37 @@ const teacherData = {
 
 export default function TeacherDetails({ params }: { params: { id: string } }) {
   const [workloadPeriod, setWorkloadPeriod] = useState("Last 8 months");
+  const [supervisor, setSupervisor] = useState("");
 
   return (
-    <div className="space-y-6 max-w-7xl mx-auto p-6 pb-10">
-      <div className="flex items-center gap-4">
-        <Link
-          href="/admin/teachers"
-          className="p-2 bg-white border border-gray-200 rounded-lg text-gray-500 hover:bg-gray-50 transition-colors"
-        >
-          <ArrowLeft className="w-5 h-5" />
-        </Link>
-        <h1 className="text-2xl font-semibold text-gray-900">
-          Teacher Details
-        </h1>
+    <div className="space-y-6 mx-auto p-6 pb-10">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="flex items-center gap-4">
+          <Link
+            href="/teachers"
+            className="p-2 bg-white border border-gray-200 rounded-lg text-gray-500 hover:bg-gray-50 transition-colors"
+          >
+            <ArrowLeft className="w-5 h-5" />
+          </Link>
+          <h1 className="text-2xl font-semibold text-gray-900">
+            Teacher Details
+          </h1>
+        </div>
+        <div className="flex flex-wrap items-center gap-3">
+          <select 
+            className="px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm font-medium text-[#1A2B4C] focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all cursor-pointer"
+            value={supervisor}
+            onChange={(e) => setSupervisor(e.target.value)}
+          >
+            <option value="" disabled>Assign Supervisor...</option>
+            <option value="Yusuf M.">Yusuf M.</option>
+            <option value="Ahmed Ali">Ahmed Ali</option>
+            <option value="Fatima Z.">Fatima Z.</option>
+          </select>
+          <button className="px-4 py-2 bg-red-50 text-red-600 rounded-lg text-sm font-medium hover:bg-red-100 transition-colors w-fit">
+            Delete Teacher
+          </button>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 xl:grid-cols-12 gap-6">
@@ -108,12 +126,6 @@ export default function TeacherDetails({ params }: { params: { id: string } }) {
             </h2>
 
             <div className="space-y-5">
-              <InfoRow
-                icon={<Users className="w-5 h-5" />}
-                label="Assigned Supervisor"
-                value={teacherData.supervisor}
-                highlight
-              />
               <InfoRow
                 icon={<Video className="w-5 h-5" />}
                 label="Zoom Meeting URL"
