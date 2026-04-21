@@ -691,6 +691,7 @@ export type Database = {
           student_id: string
           subject_id: string
           teacher_id: string
+          timezone: string
           updated_at: string
           zoom_join_url: string | null
         }
@@ -708,6 +709,7 @@ export type Database = {
           student_id: string
           subject_id: string
           teacher_id: string
+          timezone?: string
           updated_at?: string
           zoom_join_url?: string | null
         }
@@ -725,6 +727,7 @@ export type Database = {
           student_id?: string
           subject_id?: string
           teacher_id?: string
+          timezone?: string
           updated_at?: string
           zoom_join_url?: string | null
         }
@@ -788,6 +791,9 @@ export type Database = {
           scheduled_at: string
           series_id: string | null
           session_type: Database["public"]["Enums"]["session_type"]
+          shift_reason: string | null
+          shifted_at: string | null
+          shifted_from_session_id: string | null
           status: Database["public"]["Enums"]["session_status"]
           student_id: string
           subject_id: string
@@ -810,6 +816,9 @@ export type Database = {
           scheduled_at: string
           series_id?: string | null
           session_type?: Database["public"]["Enums"]["session_type"]
+          shift_reason?: string | null
+          shifted_at?: string | null
+          shifted_from_session_id?: string | null
           status?: Database["public"]["Enums"]["session_status"]
           student_id: string
           subject_id: string
@@ -832,6 +841,9 @@ export type Database = {
           scheduled_at?: string
           series_id?: string | null
           session_type?: Database["public"]["Enums"]["session_type"]
+          shift_reason?: string | null
+          shifted_at?: string | null
+          shifted_from_session_id?: string | null
           status?: Database["public"]["Enums"]["session_status"]
           student_id?: string
           subject_id?: string
@@ -903,6 +915,20 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "v_teacher_performance"
             referencedColumns: ["teacher_id"]
+          },
+          {
+            foreignKeyName: "sessions_shifted_from_session_id_fkey"
+            columns: ["shifted_from_session_id"]
+            isOneToOne: false
+            referencedRelation: "sessions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sessions_shifted_from_session_id_fkey"
+            columns: ["shifted_from_session_id"]
+            isOneToOne: false
+            referencedRelation: "v_session_details"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -1573,7 +1599,8 @@ export type Database = {
         | "completed"
         | "cancelled"
         | "no_show"
-      session_type: "recurring" | "free"
+        | "shifted"
+      session_type: "recurring" | "one_time"
       subject_category: "quran" | "arabic" | "islamic_studies"
       user_role: "admin" | "supervisor" | "teacher" | "student"
     }
@@ -1718,8 +1745,9 @@ export const Constants = {
         "completed",
         "cancelled",
         "no_show",
+        "shifted",
       ],
-      session_type: ["recurring", "free"],
+      session_type: ["recurring", "one_time"],
       subject_category: ["quran", "arabic", "islamic_studies"],
       user_role: ["admin", "supervisor", "teacher", "student"],
     },

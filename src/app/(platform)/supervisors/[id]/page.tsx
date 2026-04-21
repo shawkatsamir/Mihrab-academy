@@ -67,7 +67,11 @@ const mockEvents: CalendarEvent[] = [
   },
 ];
 
-export default function SupervisorDetails({ params }: { params: { id: string } }) {
+export default function SupervisorDetails({
+  params,
+}: {
+  params: { id: string };
+}) {
   return (
     <div className="space-y-6 max-w-7xl mx-auto p-6 pb-10">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -95,7 +99,9 @@ export default function SupervisorDetails({ params }: { params: { id: string } }
         <div className="xl:col-span-8 space-y-6">
           <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden flex flex-col">
             <div className="p-5 border-b border-gray-100 flex items-center justify-between">
-              <h2 className="text-lg font-semibold text-gray-900">Assigned Teachers</h2>
+              <h2 className="text-lg font-semibold text-gray-900">
+                Assigned Teachers
+              </h2>
             </div>
             <TeachersTable teachers={assignedTeachersMock} />
           </div>

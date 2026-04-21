@@ -2,7 +2,9 @@
 import { useState } from "react";
 import { Users, UserCheck } from "lucide-react";
 import StatsCard from "@/features/teachers/StatsCard";
-import SupervisorsTable, { Supervisor } from "@/features/supervisors/SupervisorsTable";
+import SupervisorsTable, {
+  Supervisor,
+} from "@/features/supervisors/SupervisorsTable";
 import AddSupervisorDrawer from "@/features/supervisors/AddSupervisor";
 
 const mockSupervisors: Supervisor[] = [
@@ -56,7 +58,9 @@ export default function SupervisorsPage() {
       {/* Supervisors Table Section */}
       <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden flex flex-col">
         <div className="p-5 border-b border-gray-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <h2 className="text-lg font-semibold text-gray-900">Supervisors List</h2>
+          <h2 className="text-lg font-semibold text-gray-900">
+            Supervisors List
+          </h2>
           <div className="flex items-center gap-3">
             <button
               onClick={() => setIsDrawerOpen(true)}

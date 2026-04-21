@@ -20,12 +20,14 @@ interface CalendarViewProps {
   height?: string | number;
 }
 
-export function CalendarView({ events, title = "Schedule", height = 500 }: CalendarViewProps) {
+export function CalendarView({
+  events,
+  title = "Schedule",
+  height = 500,
+}: CalendarViewProps) {
   return (
     <div className="bg-white rounded-xl border border-gray-100 p-6 shadow-sm">
-      <h2 className="text-base font-semibold text-[#1A2B4C] mb-6">
-        {title}
-      </h2>
+      <h2 className="text-base font-semibold text-[#1A2B4C] mb-6">{title}</h2>
       <div className="overflow-hidden rounded-lg border border-gray-100">
         <FullCalendar
           plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
