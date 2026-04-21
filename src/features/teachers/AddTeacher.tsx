@@ -67,9 +67,7 @@ export default function AddStaffDrawer({
 
           {/* Rating */}
           <div className="space-y-1.5">
-            <label className="text-sm font-medium text-gray-900">
-              Rating
-            </label>
+            <label className="text-sm font-medium text-gray-900">Rating</label>
             <input
               type="number"
               min="0"

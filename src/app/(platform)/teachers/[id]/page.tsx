@@ -37,7 +37,7 @@ const teacherData = {
 
 export default function TeacherDetails({ params }: { params: { id: string } }) {
   const [workloadPeriod, setWorkloadPeriod] = useState("Last 8 months");
-  
+
   const { register, handleSubmit, watch } = useForm({
     defaultValues: { supervisor: "" },
   });
@@ -58,23 +58,25 @@ export default function TeacherDetails({ params }: { params: { id: string } }) {
           </h1>
         </div>
         <div className="flex flex-wrap items-center gap-3">
-          <form 
+          <form
             onSubmit={handleSubmit((data) => {
               // TODO: Implement Supabase mutation here
               console.log("Saving supervisor:", data.supervisor);
-            })} 
+            })}
             className="flex items-center gap-2"
           >
-            <select 
+            <select
               className="px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm font-medium text-[#1A2B4C] focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all cursor-pointer"
               {...register("supervisor", { required: true })}
             >
-              <option value="" disabled>Assign Supervisor...</option>
+              <option value="" disabled>
+                Assign Supervisor...
+              </option>
               <option value="Yusuf M.">Yusuf M.</option>
               <option value="Ahmed Ali">Ahmed Ali</option>
               <option value="Fatima Z.">Fatima Z.</option>
             </select>
-            <button 
+            <button
               type="submit"
               className="bg-[#1A2B4C] hover:bg-[#0f192d] text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors disabled:opacity-50"
               disabled={!supervisorValue}

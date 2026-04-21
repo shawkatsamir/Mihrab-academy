@@ -58,7 +58,9 @@ export default function TeachersTable({ teachers }: TeachersTableProps) {
               <td className="py-4 px-6 text-gray-500">
                 <div className="flex items-center gap-1">
                   <span className="text-yellow-400">★</span>
-                  <span className="font-medium text-gray-700">{teacher.rating || "N/A"}</span>
+                  <span className="font-medium text-gray-700">
+                    {teacher.rating || "N/A"}
+                  </span>
                 </div>
               </td>
               <td className="py-4 px-6">

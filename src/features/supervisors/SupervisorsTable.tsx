@@ -15,7 +15,9 @@ interface SupervisorsTableProps {
   supervisors: Supervisor[];
 }
 
-export default function SupervisorsTable({ supervisors }: SupervisorsTableProps) {
+export default function SupervisorsTable({
+  supervisors,
+}: SupervisorsTableProps) {
   const router = useRouter();
 
   return (
@@ -49,7 +51,9 @@ export default function SupervisorsTable({ supervisors }: SupervisorsTableProps)
                 </span>
               </td>
               <td className="py-4 px-6 text-gray-500">{supervisor.email}</td>
-              <td className="py-4 px-6 text-gray-500">{supervisor.assignedTeachers}</td>
+              <td className="py-4 px-6 text-gray-500">
+                {supervisor.assignedTeachers}
+              </td>
               <td className="py-4 px-6">
                 <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-[#EAF3DE] text-[#085041]">
                   {supervisor.status}

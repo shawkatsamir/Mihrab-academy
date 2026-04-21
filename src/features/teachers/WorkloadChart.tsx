@@ -41,17 +41,9 @@ export default function WorkloadChart() {
           contentStyle={{ borderRadius: "8px" }}
         />
         <Legend iconType="circle" wrapperStyle={{ fontSize: "12px" }} />
-        <Bar
-          dataKey="totalClasses"
-          stackId="a"
-          fill="#FCEBEB"
-        />
+        <Bar dataKey="totalClasses" stackId="a" fill="#FCEBEB" />
         <Bar dataKey="teachingHours" stackId="a" fill="#E6F1FB" />
-        <Bar
-          dataKey="extraDuties"
-          stackId="a"
-          fill="#0C447C"
-        />
+        <Bar dataKey="extraDuties" stackId="a" fill="#0C447C" />
       </BarChart>
     </ResponsiveContainer>
   );
