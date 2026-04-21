@@ -53,12 +53,12 @@ export function Sidebar({ role = "admin" }: SidebarProps) {
           icon: Users,
           subItems: [
             { name: "Teachers", path: "/teachers" },
-            { name: "Supervisors", path: "/admin/supervisors" },
-            { name: "Admins", path: "/admin/admins" },
+            { name: "Supervisors", path: "/supervisors" },
+            { name: "Admins", path: "/admins" },
           ],
         },
-        { name: "Students", icon: GraduationCap, path: "/admin/students" },
-        { name: "Age Groups", icon: Layers, path: "/admin/age-groups" },
+        { name: "Students", icon: GraduationCap, path: "/students" },
+        { name: "Age Groups", icon: Layers, path: "/age-groups" },
       ],
     },
     {

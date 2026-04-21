@@ -40,7 +40,7 @@ export default function TeacherSchedule() {
       <h2 className="text-base font-semibold text-[#1A2B4C] mb-6">
         Class Schedule
       </h2>
-      <div className="h-[500px]">
+      <div className="overflow-hidden rounded-lg border border-gray-100">
         <FullCalendar
           plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
           initialView="timeGridWeek"
@@ -55,7 +55,7 @@ export default function TeacherSchedule() {
           slotMaxTime="20:00:00"
           expandRows={true}
           stickyHeaderDates={true}
-          height="100%"
+          height={500}
         />
       </div>
     </div>
