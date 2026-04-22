@@ -1,68 +1,122 @@
 "use client";
+
+import { format } from "date-fns";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/shared/ui/Table";
+import { Badge } from "@/shared/ui/Badge";
+import { Skeleton } from "@/shared/ui/Skeleton";
+import { type SupervisorWithProfile } from "@/features/supervisors/api/queries";
 import { Img } from "@/shared/ui/Image";
 import { useRouter } from "next/navigation";
 
-export interface Supervisor {
-  id: number | string;
-  name: string;
-  email: string;
-  assignedTeachers: number;
-  status: string;
-  avatar: string;
+interface Props {
+  supervisors: SupervisorWithProfile[];
+  isLoading: boolean;
+  isAdmin: boolean;
+  onEdit: (supervisor: SupervisorWithProfile) => void;
 }
 
-interface SupervisorsTableProps {
-  supervisors: Supervisor[];
-}
-
-export default function SupervisorsTable({
+export function SupervisorsTable({
   supervisors,
-}: SupervisorsTableProps) {
+  isLoading,
+  isAdmin,
+  onEdit,
+}: Props) {
   const router = useRouter();
 
+  if (isLoading) {
+    return (
+      <div className="space-y-2">
+        <Skeleton className="h-8 w-full" />
+        <Skeleton className="h-8 w-full" />
+        <Skeleton className="h-8 w-full" />
+      </div>
+    );
+  }
+
   return (
-    <div className="overflow-x-auto">
-      <table className="w-full text-left border-collapse">
-        <thead className="bg-gray-50 text-xs font-medium text-gray-500 uppercase tracking-wider">
-          <tr>
-            <th className="py-3 px-6">Name</th>
-            <th className="py-3 px-6">Email</th>
-            <th className="py-3 px-6">Assigned Teachers</th>
-            <th className="py-3 px-6">Status</th>
-          </tr>
-        </thead>
-        <tbody className="text-sm divide-y divide-gray-100">
-          {supervisors.map((supervisor) => (
-            <tr
-              key={supervisor.id}
-              onClick={() => router.push(`/supervisors/${supervisor.id}`)}
-              className="hover:bg-gray-50 cursor-pointer transition-colors group"
-            >
-              <td className="py-4 px-6 flex items-center gap-3">
-                <Img
-                  src={supervisor.avatar}
-                  alt={supervisor.name}
-                  className="w-8 h-8 rounded-full object-cover"
-                  width={32}
-                  height={32}
-                />
-                <span className="font-medium text-gray-900 group-hover:text-[#1A2B4C] transition-colors">
-                  {supervisor.name}
-                </span>
-              </td>
-              <td className="py-4 px-6 text-gray-500">{supervisor.email}</td>
-              <td className="py-4 px-6 text-gray-500">
-                {supervisor.assignedTeachers}
-              </td>
-              <td className="py-4 px-6">
-                <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-[#EAF3DE] text-[#085041]">
-                  {supervisor.status}
-                </span>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+    <div className="rounded-md border">
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>Supervisor</TableHead>
+            <TableHead>Status</TableHead>
+            <TableHead>Joined</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {supervisors.length === 0 && (
+            <TableRow>
+              <TableCell
+                colSpan={3}
+                className="text-center text-muted-foreground py-8"
+              >
+                No supervisors found.
+              </TableCell>
+            </TableRow>
+          )}
+          {supervisors.map((s) => {
+            const isActive = s.profiles?.is_active ?? true;
+            return (
+              <TableRow
+                key={s.id}
+                className="cursor-pointer hover:bg-muted/50"
+                onClick={() => router.push(`/supervisors/${s.id}`)}
+              >
+                <TableCell>
+                  <div className="flex items-center gap-3">
+                    <div className="relative h-10 w-10 rounded-full overflow-hidden bg-gray-100">
+                      {s.profiles?.photo_url ? (
+                        <Img
+                          src={s.profiles.photo_url}
+                          alt={s.profiles.full_name ?? ""}
+                          fill
+                          className="object-cover"
+                        />
+                      ) : (
+                        <div className="h-full w-full flex items-center justify-center text-xs font-medium text-gray-500">
+                          {s.profiles?.full_name?.charAt(0) ?? "S"}
+                        </div>
+                      )}
+                    </div>
+                    <div>
+                      <p className="font-medium">{s.profiles?.full_name}</p>
+                    </div>
+                  </div>
+                </TableCell>
+                <TableCell>
+                  {isActive ? (
+                    <Badge
+                      variant="secondary"
+                      className="bg-green-100 text-green-800 hover:bg-green-100"
+                    >
+                      Active
+                    </Badge>
+                  ) : (
+                    <Badge
+                      variant="secondary"
+                      className="bg-gray-100 text-gray-600 hover:bg-gray-100"
+                    >
+                      Inactive
+                    </Badge>
+                  )}
+                </TableCell>
+                <TableCell>
+                  {s.profiles?.created_at
+                    ? format(new Date(s.profiles.created_at), "MMM d, yyyy")
+                    : "-"}
+                </TableCell>
+              </TableRow>
+            );
+          })}
+        </TableBody>
+      </Table>
     </div>
   );
 }

@@ -3,16 +3,7 @@ import { useState, use } from "react";
 import { useForm } from "react-hook-form";
 import Link from "next/link";
 import { format } from "date-fns";
-import {
-  ArrowLeft,
-  Mail,
-  Phone,
-  Calendar,
-  User,
-  Video,
-  Users,
-  DollarSign,
-} from "lucide-react";
+import { ArrowLeft, Mail, Phone, Calendar, User, Video } from "lucide-react";
 import TeacherWorkloadAreaChart from "@/features/teachers/TeacherWorkloadAreaChart";
 import { Img } from "@/shared/ui/Image";
 import { Skeleton } from "@/shared/ui/Skeleton";
@@ -39,7 +30,11 @@ const teacherData = {
   zoomUrl: "https://zoom.us/j/9876543210",
 };
 
-export default function TeacherDetails({ params }: { params: Promise<{ id: string }> }) {
+export default function TeacherDetails({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
   const { id } = use(params);
   const [workloadPeriod, setWorkloadPeriod] = useState("Last 8 months");
 
@@ -174,15 +169,19 @@ export default function TeacherDetails({ params }: { params: Promise<{ id: strin
                 {teacherData.employmentType}
               </span>
             </div>
-            
+
             <div className="w-full flex flex-col gap-2">
               <div className="flex justify-between items-center py-2 border-t border-gray-100">
                 <span className="text-sm text-gray-500">Price / Session</span>
-                <span className="text-sm font-semibold text-[#1A2B4C]">{price}</span>
+                <span className="text-sm font-semibold text-[#1A2B4C]">
+                  {price}
+                </span>
               </div>
               <div className="flex justify-between items-center py-2 border-t border-gray-100">
                 <span className="text-sm text-gray-500">Joined</span>
-                <span className="text-sm font-semibold text-[#1A2B4C]">{joinDate}</span>
+                <span className="text-sm font-semibold text-[#1A2B4C]">
+                  {joinDate}
+                </span>
               </div>
             </div>
           </div>
