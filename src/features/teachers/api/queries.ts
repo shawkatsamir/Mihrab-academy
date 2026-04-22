@@ -24,6 +24,19 @@ export function useTeachers() {
   });
 }
 
+import { getTeacher } from "../actions/getTeacher";
+
+export function useTeacher(id: string) {
+  return useQuery({
+    queryKey: teacherKeys.detail(id),
+    queryFn: async () => {
+      const data = await getTeacher(id);
+      return data;
+    },
+    enabled: !!id,
+  });
+}
+
 export function useUpdateTeacher() {
   const queryClient = useQueryClient();
 

@@ -14,6 +14,8 @@ import { Skeleton } from "@/shared/ui/Skeleton";
 import { type TeacherWithProfile } from "@/features/teachers/api/queries";
 import { Img } from "@/shared/ui/Image";
 
+import { useRouter } from "next/navigation";
+
 interface Props {
   teachers: TeacherWithProfile[];
   isLoading: boolean;
@@ -22,6 +24,7 @@ interface Props {
 }
 
 export function TeachersTable({ teachers, isLoading, isAdmin, onEdit }: Props) {
+  const router = useRouter();
 
   if (isLoading) {
     return (
@@ -58,7 +61,11 @@ export function TeachersTable({ teachers, isLoading, isAdmin, onEdit }: Props) {
           {teachers.map((t) => {
             const isActive = t.profiles?.is_active ?? true;
             return (
-              <TableRow key={t.id}>
+              <TableRow 
+                key={t.id}
+                className="cursor-pointer hover:bg-muted/50"
+                onClick={() => router.push(`/teachers/${t.id}`)}
+              >
                 <TableCell>
                   <div className="flex items-center gap-3">
                     <div className="relative h-10 w-10 rounded-full overflow-hidden bg-gray-100">
