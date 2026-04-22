@@ -2,7 +2,7 @@
 import Link from "next/link";
 import { ArrowLeft, Mail, ShieldAlert } from "lucide-react";
 import { Img } from "@/shared/ui/Image";
-import TeachersTable, { Teacher } from "@/features/teachers/TeachersTable";
+import { TeachersTable } from "@/features/teachers/TeachersTable";
 import { CalendarView, CalendarEvent } from "@/shared/ui/CalendarView";
 
 // Mock Data
@@ -14,26 +14,28 @@ const supervisorData = {
   email: "yusuf.m@miharab.com",
 };
 
-const assignedTeachersMock: Teacher[] = [
+const assignedTeachersMock: any[] = [
   {
-    id: 1,
-    name: "Omar S.",
-    email: "omar.s@miharab.com",
-    students: 45,
-    supervisor: "Yusuf M.",
-    rating: 4.9,
-    status: "Active",
-    avatar: "https://i.pravatar.cc/150?u=t1",
+    id: "1",
+    bio: "Quran Session",
+    price_per_session: 5000,
+    profiles: {
+      full_name: "Omar S.",
+      photo_url: "https://i.pravatar.cc/150?u=t1",
+      is_active: true,
+      created_at: new Date().toISOString(),
+    }
   },
   {
-    id: 2,
-    name: "Ali R.",
-    email: "ali.r@miharab.com",
-    students: 30,
-    supervisor: "Yusuf M.",
-    rating: 4.5,
-    status: "Active",
-    avatar: "https://i.pravatar.cc/150?u=t3",
+    id: "2",
+    bio: "Arabic Grammar",
+    price_per_session: 4000,
+    profiles: {
+      full_name: "Ali R.",
+      photo_url: "https://i.pravatar.cc/150?u=t3",
+      is_active: true,
+      created_at: new Date().toISOString(),
+    }
   },
 ];
 
@@ -103,7 +105,7 @@ export default function SupervisorDetails({
                 Assigned Teachers
               </h2>
             </div>
-            <TeachersTable teachers={assignedTeachersMock} />
+            <TeachersTable teachers={assignedTeachersMock} isLoading={false} isAdmin={false} onEdit={() => {}} />
           </div>
 
           <CalendarView events={mockEvents} title="Supervised Sessions" />

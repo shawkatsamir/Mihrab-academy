@@ -1,77 +1,122 @@
 "use client";
+
+import { format } from "date-fns";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/shared/ui/Table";
+import { Badge } from "@/shared/ui/Badge";
+import { Skeleton } from "@/shared/ui/Skeleton";
+import { type TeacherWithProfile } from "@/features/teachers/api/queries";
 import { Img } from "@/shared/ui/Image";
-import { useRouter } from "next/navigation";
 
-export interface Teacher {
-  id: number | string;
-  name: string;
-  email: string;
-  students: number;
-  supervisor: string;
-  rating?: number;
-  status: string;
-  avatar: string;
+interface Props {
+  teachers: TeacherWithProfile[];
+  isLoading: boolean;
+  isAdmin: boolean;
+  onEdit: (teacher: TeacherWithProfile) => void;
 }
 
-interface TeachersTableProps {
-  teachers: Teacher[];
-}
+export function TeachersTable({ teachers, isLoading, isAdmin, onEdit }: Props) {
 
-export default function TeachersTable({ teachers }: TeachersTableProps) {
-  const router = useRouter();
+  if (isLoading) {
+    return (
+      <div className="space-y-2">
+        <Skeleton className="h-8 w-full" />
+        <Skeleton className="h-8 w-full" />
+        <Skeleton className="h-8 w-full" />
+      </div>
+    );
+  }
 
   return (
-    <div className="overflow-x-auto">
-      <table className="w-full text-left border-collapse">
-        <thead className="bg-gray-50 text-xs font-medium text-gray-500 uppercase tracking-wider">
-          <tr>
-            <th className="py-3 px-6">Name</th>
-            <th className="py-3 px-6">Email</th>
-            <th className="py-3 px-6">Students</th>
-            <th className="py-3 px-6">Supervisor</th>
-            <th className="py-3 px-6">Rating</th>
-            <th className="py-3 px-6">Status</th>
-          </tr>
-        </thead>
-        <tbody className="text-sm divide-y divide-gray-100">
-          {teachers.map((teacher) => (
-            <tr
-              key={teacher.id}
-              onClick={() => router.push(`/teachers/${teacher.id}`)}
-              className="hover:bg-gray-50 cursor-pointer transition-colors group"
-            >
-              <td className="py-4 px-6 flex items-center gap-3">
-                <Img
-                  src={teacher.avatar}
-                  alt={teacher.name}
-                  className="w-8 h-8 rounded-full object-cover"
-                  width={32}
-                  height={32}
-                />
-                <span className="font-medium text-gray-900 group-hover:text-[#1A2B4C] transition-colors">
-                  {teacher.name}
-                </span>
-              </td>
-              <td className="py-4 px-6 text-gray-500">{teacher.email}</td>
-              <td className="py-4 px-6 text-gray-500">{teacher.students}</td>
-              <td className="py-4 px-6 text-gray-500">{teacher.supervisor}</td>
-              <td className="py-4 px-6 text-gray-500">
-                <div className="flex items-center gap-1">
-                  <span className="text-yellow-400">★</span>
-                  <span className="font-medium text-gray-700">
-                    {teacher.rating || "N/A"}
-                  </span>
-                </div>
-              </td>
-              <td className="py-4 px-6">
-                <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-[#EAF3DE] text-[#085041]">
-                  {teacher.status}
-                </span>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+    <div className="rounded-md border">
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>Teacher</TableHead>
+            <TableHead>Status</TableHead>
+            <TableHead>Price / Session</TableHead>
+            <TableHead>Joined</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {teachers.length === 0 && (
+            <TableRow>
+              <TableCell
+                colSpan={4}
+                className="text-center text-muted-foreground py-8"
+              >
+                No teachers found.
+              </TableCell>
+            </TableRow>
+          )}
+          {teachers.map((t) => {
+            const isActive = t.profiles?.is_active ?? true;
+            return (
+              <TableRow key={t.id}>
+                <TableCell>
+                  <div className="flex items-center gap-3">
+                    <div className="relative h-10 w-10 rounded-full overflow-hidden bg-gray-100">
+                      {t.profiles?.photo_url ? (
+                        <Img
+                          src={t.profiles.photo_url}
+                          alt={t.profiles.full_name ?? ""}
+                          fill
+                          className="object-cover"
+                        />
+                      ) : (
+                        <div className="h-full w-full flex items-center justify-center text-xs font-medium text-gray-500">
+                          {t.profiles?.full_name?.charAt(0) ?? "T"}
+                        </div>
+                      )}
+                    </div>
+                    <div>
+                      <p className="font-medium">{t.profiles?.full_name}</p>
+                      {t.bio && (
+                        <p className="text-xs text-muted-foreground line-clamp-1 max-w-[240px]">
+                          {t.bio}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                </TableCell>
+                <TableCell>
+                  {isActive ? (
+                    <Badge
+                      variant="secondary"
+                      className="bg-green-100 text-green-800 hover:bg-green-100"
+                    >
+                      Active
+                    </Badge>
+                  ) : (
+                    <Badge
+                      variant="secondary"
+                      className="bg-gray-100 text-gray-600 hover:bg-gray-100"
+                    >
+                      Inactive
+                    </Badge>
+                  )}
+                </TableCell>
+                <TableCell>
+                  {t.price_per_session
+                    ? `$${t.price_per_session.toFixed(2)}`
+                    : "-"}
+                </TableCell>
+                <TableCell>
+                  {t.profiles?.created_at
+                    ? format(new Date(t.profiles.created_at), "MMM d, yyyy")
+                    : "-"}
+                </TableCell>
+              </TableRow>
+            );
+          })}
+        </TableBody>
+      </Table>
     </div>
   );
 }
