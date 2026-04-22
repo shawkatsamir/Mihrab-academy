@@ -1,77 +1,192 @@
 "use client";
-import { X, Upload } from "lucide-react";
 
-interface AddSupervisorDrawerProps {
-  isOpen: boolean;
-  onClose: () => void;
+import { useState, useRef } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/shared/ui/Dialog";
+import { Button } from "@/shared/ui/Button";
+import { Input } from "@/shared/ui/Input";
+import { Label } from "@/shared/ui/Label";
+import { createSupervisor } from "@/features/supervisors/actions/createSupervisor";
+import {
+  useUpdateSupervisor,
+  type SupervisorWithProfile,
+} from "@/features/supervisors/api/queries";
+import {
+  supervisorFormSchema,
+  supervisorEditSchema,
+  type SupervisorFormValues,
+  type SupervisorEditValues,
+} from "@/features/supervisors/schema";
+import { Img } from "@/shared/ui/Image";
+
+interface Props {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  supervisor: SupervisorWithProfile | null;
 }
 
-export default function AddSupervisorDrawer({
-  isOpen,
-  onClose,
-}: AddSupervisorDrawerProps) {
-  if (!isOpen) return null;
+export function SupervisorFormModal({ open, onOpenChange, supervisor }: Props) {
+  const isEdit = !!supervisor;
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [preview, setPreview] = useState<string | null>(
+    supervisor?.profiles?.photo_url ?? null,
+  );
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [pending, setPending] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const updateMutation = useUpdateSupervisor();
+
+  const form = useForm<SupervisorFormValues | SupervisorEditValues>({
+    resolver: zodResolver(isEdit ? supervisorEditSchema : supervisorFormSchema),
+    defaultValues: {
+      full_name: supervisor?.profiles?.full_name ?? "",
+      email: "",
+    },
+  });
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setImageFile(file);
+      setPreview(URL.createObjectURL(file));
+    }
+  };
+
+  const onSubmit = async (values: SupervisorFormValues | SupervisorEditValues) => {
+    setError(null);
+    setPending(true);
+
+    try {
+      if (isEdit && supervisor) {
+        await updateMutation.mutateAsync({
+          id: supervisor.id,
+          values: {
+            full_name: values.full_name,
+          },
+          imageFile: imageFile ?? undefined,
+        });
+      } else {
+        const formData = new FormData();
+        formData.append("full_name", values.full_name);
+        formData.append("email", (values as SupervisorFormValues).email);
+        if (imageFile) formData.append("image", imageFile);
+
+        await createSupervisor(formData);
+      }
+
+      form.reset();
+      setPreview(null);
+      setImageFile(null);
+      onOpenChange(false);
+    } catch (err: any) {
+      setError(err.message ?? "Something went wrong");
+    } finally {
+      setPending(false);
+    }
+  };
 
   return (
-    <div className="fixed inset-0 z-50 flex justify-end">
-      <div
-        className="absolute inset-0 bg-black/20 backdrop-blur-sm transition-opacity"
-        onClick={onClose}
-      />
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle>
+            {isEdit ? "Edit Supervisor" : "Add Supervisor"}
+          </DialogTitle>
+        </DialogHeader>
 
-      <div className="relative w-full max-w-[400px] bg-white h-full shadow-2xl flex flex-col animate-in slide-in-from-right duration-300">
-        <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
-          <h2 className="text-lg font-medium text-gray-900">Add Supervisor</h2>
-          <button
-            onClick={onClose}
-            className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-50 rounded-full transition-colors"
-          >
-            <X className="w-5 h-5" />
-          </button>
-        </div>
-
-        <div className="flex-1 overflow-y-auto p-6 space-y-6">
-          {/* Photo Upload */}
-          <div className="flex flex-col items-center justify-center p-6 border-2 border-dashed border-gray-200 rounded-xl bg-gray-50 hover:bg-gray-100 transition-colors cursor-pointer group">
-            <div className="w-16 h-16 rounded-full bg-white flex items-center justify-center mb-3 shadow-sm group-hover:text-blue-600 transition-colors">
-              <Upload className="w-6 h-6 text-gray-400 group-hover:text-blue-600 transition-colors" />
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          {/* Image Upload */}
+          <div className="space-y-2">
+            <Label>Photo</Label>
+            <div className="flex items-center gap-4">
+              <div className="relative h-16 w-16 rounded-full overflow-hidden bg-gray-100 border">
+                {preview ? (
+                  <Img
+                    src={preview}
+                    alt="Preview"
+                    fill
+                    className="object-cover"
+                  />
+                ) : (
+                  <div className="h-full w-full flex items-center justify-center text-xs text-gray-500">
+                    IMG
+                  </div>
+                )}
+              </div>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={handleFileChange}
+              />
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => fileInputRef.current?.click()}
+              >
+                {preview ? "Change" : "Upload"}
+              </Button>
             </div>
-            <span className="text-sm font-medium text-gray-900">
-              Upload profile photo
-            </span>
           </div>
 
           {/* Full Name */}
-          <div className="space-y-1.5">
-            <label className="text-sm font-medium text-gray-900">
-              Full Name
-            </label>
-            <input
-              type="text"
+          <div className="space-y-2">
+            <Label htmlFor="full_name">Full Name</Label>
+            <Input
+              id="full_name"
+              {...form.register("full_name")}
               placeholder="e.g. Yusuf M."
-              className="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
             />
+            {form.formState.errors.full_name && (
+              <p className="text-xs text-red-500">
+                {form.formState.errors.full_name.message}
+              </p>
+            )}
           </div>
 
-          {/* Email */}
-          <div className="space-y-1.5">
-            <label className="text-sm font-medium text-gray-900">
-              Email Address
-            </label>
-            <input
-              type="email"
-              placeholder="yusuf@miharab.com"
-              className="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
-            />
-          </div>
-        </div>
+          {/* Email (create only) */}
+          {!isEdit && (
+            <div className="space-y-2">
+              <Label htmlFor="email">Email</Label>
+              <Input
+                id="email"
+                type="email"
+                {...form.register("email")}
+                placeholder="supervisor@example.com"
+              />
+              {(form.formState.errors as any).email && (
+                <p className="text-xs text-red-500">
+                  {(form.formState.errors as any).email?.message}
+                </p>
+              )}
+            </div>
+          )}
 
-        <div className="p-6 border-t border-gray-100">
-          <button className="w-full py-2.5 bg-[#1A2B4C] hover:bg-[#0f192d] text-white text-sm font-medium rounded-lg transition-colors">
-            Create Supervisor
-          </button>
-        </div>
-      </div>
-    </div>
+          {error && <p className="text-sm text-red-500">{error}</p>}
+
+          <div className="flex justify-end gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => onOpenChange(false)}
+            >
+              Cancel
+            </Button>
+            <Button type="submit" disabled={pending}>
+              {pending ? "Saving..." : isEdit ? "Save Changes" : "Create"}
+            </Button>
+          </div>
+        </form>
+      </DialogContent>
+    </Dialog>
   );
 }

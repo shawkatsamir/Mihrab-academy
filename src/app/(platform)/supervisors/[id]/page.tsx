@@ -1,18 +1,16 @@
 "use client";
+
+import { use } from "react";
 import Link from "next/link";
+import { format } from "date-fns";
 import { ArrowLeft, Mail, ShieldAlert } from "lucide-react";
 import { Img } from "@/shared/ui/Image";
+import { Skeleton } from "@/shared/ui/Skeleton";
 import { TeachersTable } from "@/features/teachers/TeachersTable";
 import { CalendarView, CalendarEvent } from "@/shared/ui/CalendarView";
+import { useSupervisor } from "@/features/supervisors/api/queries";
 
-// Mock Data
-const supervisorData = {
-  id: "1",
-  name: "Yusuf M.",
-  status: "Active",
-  avatar: "https://i.pravatar.cc/150?u=s1",
-  email: "yusuf.m@miharab.com",
-};
+// ── Mock data (kept as-is; will be replaced gradually) ──────────────────────
 
 const assignedTeachersMock: any[] = [
   {
@@ -24,7 +22,7 @@ const assignedTeachersMock: any[] = [
       photo_url: "https://i.pravatar.cc/150?u=t1",
       is_active: true,
       created_at: new Date().toISOString(),
-    }
+    },
   },
   {
     id: "2",
@@ -35,7 +33,7 @@ const assignedTeachersMock: any[] = [
       photo_url: "https://i.pravatar.cc/150?u=t3",
       is_active: true,
       created_at: new Date().toISOString(),
-    }
+    },
   },
 ];
 
@@ -69,13 +67,47 @@ const mockEvents: CalendarEvent[] = [
   },
 ];
 
+// ── Page ────────────────────────────────────────────────────────────────────
+
 export default function SupervisorDetails({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
+  const { id } = use(params);
+  const { data: supervisor, isLoading } = useSupervisor(id);
+
+  // ── Loading state ──────────────────────────────────────────────────────────
+  if (isLoading) {
+    return (
+      <div className="space-y-6 max-w-7xl mx-auto p-6 pb-10">
+        <Skeleton className="h-10 w-48 mb-6" />
+        <Skeleton className="h-[400px] w-full rounded-xl" />
+      </div>
+    );
+  }
+
+  // ── Not found ──────────────────────────────────────────────────────────────
+  if (!supervisor) {
+    return (
+      <div className="p-6 text-center text-gray-500">
+        Supervisor not found.
+      </div>
+    );
+  }
+
+  // ── Derived values from real data ──────────────────────────────────────────
+  const fullName = supervisor.profiles?.full_name ?? "—";
+  const avatarUrl = supervisor.profiles?.photo_url ?? null;
+  const isActive = supervisor.profiles?.is_active ?? true;
+  const email = supervisor.email ?? "—";
+  const joinDate = supervisor.profiles?.created_at
+    ? format(new Date(supervisor.profiles.created_at), "MMM d, yyyy")
+    : "—";
+
   return (
     <div className="space-y-6 max-w-7xl mx-auto p-6 pb-10">
+      {/* ── Page Header ─────────────────────────────────────────────────────── */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="flex items-center gap-4">
           <Link
@@ -97,7 +129,7 @@ export default function SupervisorDetails({
       </div>
 
       <div className="grid grid-cols-1 xl:grid-cols-12 gap-6">
-        {/* Main Content Area (Calendar and Teachers) */}
+        {/* ── Main Content (mock — will be replaced gradually) ─────────────── */}
         <div className="xl:col-span-8 space-y-6">
           <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden flex flex-col">
             <div className="p-5 border-b border-gray-100 flex items-center justify-between">
@@ -105,35 +137,63 @@ export default function SupervisorDetails({
                 Assigned Teachers
               </h2>
             </div>
-            <TeachersTable teachers={assignedTeachersMock} isLoading={false} isAdmin={false} onEdit={() => {}} />
+            <TeachersTable
+              teachers={assignedTeachersMock}
+              isLoading={false}
+              isAdmin={false}
+              onEdit={() => {}}
+            />
           </div>
 
           <CalendarView events={mockEvents} title="Supervised Sessions" />
         </div>
 
-        {/* Sidebar Info */}
+        {/* ── Sidebar — REAL DATA ──────────────────────────────────────────── */}
         <div className="xl:col-span-4 space-y-6">
+          {/* Avatar + Name + Status card */}
           <div className="bg-white rounded-xl border border-gray-100 p-6 shadow-sm flex flex-col items-center text-center">
-            <div className="w-24 h-24 rounded-2xl bg-[#FCEBEB] mb-4 overflow-hidden border-4 border-white shadow-sm">
-              <Img
-                src={supervisorData.avatar}
-                alt={supervisorData.name}
-                className="w-full h-full object-cover"
-                width={100}
-                height={100}
-              />
+            <div className="w-24 h-24 relative rounded-2xl bg-[#FCEBEB] mb-4 overflow-hidden border-4 border-white shadow-sm flex items-center justify-center">
+              {avatarUrl ? (
+                <Img
+                  src={avatarUrl}
+                  alt={fullName}
+                  className="w-full h-full object-cover"
+                  fill
+                />
+              ) : (
+                <span className="text-3xl font-semibold text-gray-400">
+                  {fullName.charAt(0)}
+                </span>
+              )}
             </div>
+
             <h2 className="text-xl font-bold text-[#1A2B4C] mb-2">
-              {supervisorData.name}
+              {fullName}
             </h2>
+
             <div className="flex gap-2 mb-6">
-              <span className="px-2.5 py-1 bg-[#EAF3DE] text-[#085041] rounded-full text-xs font-medium">
-                {supervisorData.status}
+              <span
+                className={`px-2.5 py-1 rounded-full text-xs font-medium ${
+                  isActive
+                    ? "bg-[#EAF3DE] text-[#085041]"
+                    : "bg-gray-100 text-gray-500"
+                }`}
+              >
+                {isActive ? "Active" : "Inactive"}
               </span>
+            </div>
+
+            <div className="w-full flex flex-col gap-2">
+              <div className="flex justify-between items-center py-2 border-t border-gray-100">
+                <span className="text-sm text-gray-500">Joined</span>
+                <span className="text-sm font-semibold text-[#1A2B4C]">
+                  {joinDate}
+                </span>
+              </div>
             </div>
           </div>
 
-          {/* Personal Info */}
+          {/* Contact Information card */}
           <div className="bg-white rounded-xl border border-gray-100 p-6 shadow-sm">
             <h2 className="text-base font-semibold text-[#1A2B4C] mb-6">
               Contact Information
@@ -142,7 +202,7 @@ export default function SupervisorDetails({
               <InfoRow
                 icon={<Mail className="w-5 h-5" />}
                 label="Email Address"
-                value={supervisorData.email}
+                value={email}
               />
             </div>
           </div>
@@ -152,11 +212,17 @@ export default function SupervisorDetails({
   );
 }
 
+// ── Shared helper ────────────────────────────────────────────────────────────
+
 function InfoRow({ icon, label, value, highlight = false }: any) {
   return (
     <div className="flex items-start gap-4">
       <div
-        className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${highlight ? "bg-[#1A2B4C] text-white" : "bg-[#E6F1FB] text-[#0C447C]"}`}
+        className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${
+          highlight
+            ? "bg-[#1A2B4C] text-white"
+            : "bg-[#E6F1FB] text-[#0C447C]"
+        }`}
       >
         {icon}
       </div>
