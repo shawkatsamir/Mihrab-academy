@@ -11,9 +11,11 @@ import {
 } from "@/shared/ui/Table";
 import { Badge } from "@/shared/ui/Badge";
 import { Skeleton } from "@/shared/ui/Skeleton";
-import { type TeacherWithProfile } from "@/features/teachers/api/queries";
+import {
+  type TeacherWithProfile,
+  getSupervisorName,
+} from "@/features/teachers/api/queries";
 import { Img } from "@/shared/ui/Image";
-
 import { useRouter } from "next/navigation";
 
 interface Props {
@@ -42,6 +44,7 @@ export function TeachersTable({ teachers, isLoading, isAdmin, onEdit }: Props) {
         <TableHeader>
           <TableRow>
             <TableHead>Teacher</TableHead>
+            <TableHead>Supervisor</TableHead>
             <TableHead>Status</TableHead>
             <TableHead>Price / Session</TableHead>
             <TableHead>Joined</TableHead>
@@ -51,7 +54,7 @@ export function TeachersTable({ teachers, isLoading, isAdmin, onEdit }: Props) {
           {teachers.length === 0 && (
             <TableRow>
               <TableCell
-                colSpan={4}
+                colSpan={5}
                 className="text-center text-muted-foreground py-8"
               >
                 No teachers found.
@@ -60,15 +63,18 @@ export function TeachersTable({ teachers, isLoading, isAdmin, onEdit }: Props) {
           )}
           {teachers.map((t) => {
             const isActive = t.profiles?.is_active ?? true;
+            const supervisorName = getSupervisorName(t);
+
             return (
-              <TableRow 
+              <TableRow
                 key={t.id}
                 className="cursor-pointer hover:bg-muted/50"
                 onClick={() => router.push(`/teachers/${t.id}`)}
               >
+                {/* Teacher name + avatar */}
                 <TableCell>
                   <div className="flex items-center gap-3">
-                    <div className="relative h-10 w-10 rounded-full overflow-hidden bg-gray-100">
+                    <div className="relative h-10 w-10 rounded-full overflow-hidden bg-gray-100 shrink-0">
                       {t.profiles?.photo_url ? (
                         <Img
                           src={t.profiles.photo_url}
@@ -85,13 +91,28 @@ export function TeachersTable({ teachers, isLoading, isAdmin, onEdit }: Props) {
                     <div>
                       <p className="font-medium">{t.profiles?.full_name}</p>
                       {t.bio && (
-                        <p className="text-xs text-muted-foreground line-clamp-1 max-w-[240px]">
+                        <p className="text-xs text-muted-foreground line-clamp-1 max-w-[200px]">
                           {t.bio}
                         </p>
                       )}
                     </div>
                   </div>
                 </TableCell>
+
+                {/* Supervisor */}
+                <TableCell>
+                  {supervisorName ? (
+                    <span className="text-sm text-[#1A2B4C] font-medium">
+                      {supervisorName}
+                    </span>
+                  ) : (
+                    <span className="text-xs text-muted-foreground italic">
+                      Unassigned
+                    </span>
+                  )}
+                </TableCell>
+
+                {/* Status */}
                 <TableCell>
                   {isActive ? (
                     <Badge
@@ -109,15 +130,19 @@ export function TeachersTable({ teachers, isLoading, isAdmin, onEdit }: Props) {
                     </Badge>
                   )}
                 </TableCell>
+
+                {/* Price */}
                 <TableCell>
                   {t.price_per_session
                     ? `$${t.price_per_session.toFixed(2)}`
-                    : "-"}
+                    : "—"}
                 </TableCell>
+
+                {/* Joined */}
                 <TableCell>
                   {t.profiles?.created_at
                     ? format(new Date(t.profiles.created_at), "MMM d, yyyy")
-                    : "-"}
+                    : "—"}
                 </TableCell>
               </TableRow>
             );
