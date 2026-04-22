@@ -1,7 +1,8 @@
 "use client";
-import { useState } from "react";
+import { useState, use } from "react";
 import { useForm } from "react-hook-form";
 import Link from "next/link";
+import { format } from "date-fns";
 import {
   ArrowLeft,
   Mail,
@@ -10,9 +11,12 @@ import {
   User,
   Video,
   Users,
+  DollarSign,
 } from "lucide-react";
 import TeacherWorkloadAreaChart from "@/features/teachers/TeacherWorkloadAreaChart";
 import { Img } from "@/shared/ui/Image";
+import { Skeleton } from "@/shared/ui/Skeleton";
+import { useTeacher } from "@/features/teachers/api/queries";
 
 import TeacherSchedule from "@/features/teachers/TeacherSchedule";
 import TeacherPerformance from "@/features/teachers/TeacherPerformance";
@@ -35,13 +39,40 @@ const teacherData = {
   zoomUrl: "https://zoom.us/j/9876543210",
 };
 
-export default function TeacherDetails({ params }: { params: { id: string } }) {
+export default function TeacherDetails({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = use(params);
   const [workloadPeriod, setWorkloadPeriod] = useState("Last 8 months");
 
   const { register, handleSubmit, watch } = useForm({
     defaultValues: { supervisor: "" },
   });
   const supervisorValue = watch("supervisor");
+
+  const { data: teacher, isLoading } = useTeacher(id);
+
+  if (isLoading) {
+    return (
+      <div className="space-y-6 mx-auto p-6 pb-10">
+        <Skeleton className="h-10 w-48 mb-6" />
+        <Skeleton className="h-[400px] w-full rounded-xl" />
+      </div>
+    );
+  }
+
+  if (!teacher) {
+    return (
+      <div className="p-6 text-center text-gray-500">Teacher not found.</div>
+    );
+  }
+
+  const fullName = teacher.profiles?.full_name || teacherData.name;
+  const avatarUrl = teacher.profiles?.photo_url || teacherData.avatar;
+  const joinDate = teacher.profiles?.created_at
+    ? format(new Date(teacher.profiles.created_at), "MMM d, yyyy")
+    : "Unknown";
+  const price = teacher.price_per_session
+    ? `$${teacher.price_per_session.toFixed(2)}`
+    : "Not Set";
 
   return (
     <div className="space-y-6 mx-auto p-6 pb-10">
@@ -118,17 +149,22 @@ export default function TeacherDetails({ params }: { params: { id: string } }) {
         {/* Sidebar Info */}
         <div className="xl:col-span-4 space-y-6">
           <div className="bg-white rounded-xl border border-gray-100 p-6 shadow-sm flex flex-col items-center text-center">
-            <div className="w-24 h-24 rounded-2xl bg-[#FCEBEB] mb-4 overflow-hidden border-4 border-white shadow-sm">
-              <Img
-                src={teacherData.avatar}
-                alt={teacherData.name}
-                className="w-full h-full object-cover"
-                width={100}
-                height={100}
-              />
+            <div className="w-24 h-24 relative rounded-2xl bg-[#FCEBEB] mb-4 overflow-hidden border-4 border-white shadow-sm flex items-center justify-center">
+              {avatarUrl ? (
+                <Img
+                  src={avatarUrl}
+                  alt={fullName}
+                  className="w-full h-full object-cover"
+                  fill
+                />
+              ) : (
+                <span className="text-3xl font-semibold text-gray-400">
+                  {fullName.charAt(0)}
+                </span>
+              )}
             </div>
             <h2 className="text-xl font-bold text-[#1A2B4C] mb-2">
-              {teacherData.name}
+              {fullName}
             </h2>
             <div className="flex gap-2 mb-6">
               <span className="px-2.5 py-1 bg-gray-50 border border-gray-200 rounded-md text-xs font-medium text-gray-600">
@@ -137,6 +173,17 @@ export default function TeacherDetails({ params }: { params: { id: string } }) {
               <span className="px-2.5 py-1 bg-[#E6F1FB] text-[#0C447C] rounded-md text-xs font-medium">
                 {teacherData.employmentType}
               </span>
+            </div>
+            
+            <div className="w-full flex flex-col gap-2">
+              <div className="flex justify-between items-center py-2 border-t border-gray-100">
+                <span className="text-sm text-gray-500">Price / Session</span>
+                <span className="text-sm font-semibold text-[#1A2B4C]">{price}</span>
+              </div>
+              <div className="flex justify-between items-center py-2 border-t border-gray-100">
+                <span className="text-sm text-gray-500">Joined</span>
+                <span className="text-sm font-semibold text-[#1A2B4C]">{joinDate}</span>
+              </div>
             </div>
           </div>
 
