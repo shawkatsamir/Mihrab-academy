@@ -1399,6 +1399,7 @@ export type Database = {
           bio: string | null
           created_at: string
           id: string
+          price_per_session: number | null
           sogo_email: string | null
           updated_at: string
           zoom_personal_link: string | null
@@ -1409,6 +1410,7 @@ export type Database = {
           bio?: string | null
           created_at?: string
           id: string
+          price_per_session?: number | null
           sogo_email?: string | null
           updated_at?: string
           zoom_personal_link?: string | null
@@ -1419,6 +1421,7 @@ export type Database = {
           bio?: string | null
           created_at?: string
           id?: string
+          price_per_session?: number | null
           sogo_email?: string | null
           updated_at?: string
           zoom_personal_link?: string | null
