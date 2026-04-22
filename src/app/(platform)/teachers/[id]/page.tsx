@@ -1,34 +1,42 @@
 "use client";
+
 import { useState, use } from "react";
-import { useForm } from "react-hook-form";
 import Link from "next/link";
 import { format } from "date-fns";
-import { ArrowLeft, Mail, Phone, Calendar, User, Video } from "lucide-react";
+import {
+  ArrowLeft,
+  Mail,
+  Phone,
+  Calendar,
+  User,
+  Video,
+  UserCheck,
+  Shield,
+} from "lucide-react";
 import TeacherWorkloadAreaChart from "@/features/teachers/TeacherWorkloadAreaChart";
 import { Img } from "@/shared/ui/Image";
 import { Skeleton } from "@/shared/ui/Skeleton";
-import { useTeacher } from "@/features/teachers/api/queries";
-
+import {
+  useTeacher,
+  getSupervisorName,
+  getSupervisorId,
+} from "@/features/teachers/api/queries";
+import { AssignSupervisorModal } from "@/features/teachers/AssignSupervisorModal";
 import TeacherSchedule from "@/features/teachers/TeacherSchedule";
 import TeacherPerformance from "@/features/teachers/TeacherPerformance";
 
-// Mock Data
+// ── Remaining mock data (will be replaced gradually) ──────────────────────────
 const teacherData = {
-  id: "1",
-  name: "Omar S.",
   idNumber: "T-1003",
   employmentType: "Full-Time",
-  avatar: "https://i.pravatar.cc/150?u=t1",
-  subject: "Quran Memorization, Tajweed",
-  students: "45 Active Students",
   gender: "Male",
   dob: "April 15, 1990",
   email: "omar.s@miharab.com",
   phone: "+1 234 567 8900",
-  address: "123 Islamic Center Dr, NY, USA",
-  supervisor: "Yusuf M.",
   zoomUrl: "https://zoom.us/j/9876543210",
 };
+
+// ─────────────────────────────────────────────────────────────────────────────
 
 export default function TeacherDetails({
   params,
@@ -37,11 +45,7 @@ export default function TeacherDetails({
 }) {
   const { id } = use(params);
   const [workloadPeriod, setWorkloadPeriod] = useState("Last 8 months");
-
-  const { register, handleSubmit, watch } = useForm({
-    defaultValues: { supervisor: "" },
-  });
-  const supervisorValue = watch("supervisor");
+  const [assignModalOpen, setAssignModalOpen] = useState(false);
 
   const { data: teacher, isLoading } = useTeacher(id);
 
@@ -60,17 +64,21 @@ export default function TeacherDetails({
     );
   }
 
-  const fullName = teacher.profiles?.full_name || teacherData.name;
-  const avatarUrl = teacher.profiles?.photo_url || teacherData.avatar;
+  // ── Derived values ─────────────────────────────────────────────────────────
+  const fullName = teacher.profiles?.full_name ?? "—";
+  const avatarUrl = teacher.profiles?.photo_url ?? null;
   const joinDate = teacher.profiles?.created_at
     ? format(new Date(teacher.profiles.created_at), "MMM d, yyyy")
     : "Unknown";
   const price = teacher.price_per_session
     ? `$${teacher.price_per_session.toFixed(2)}`
     : "Not Set";
+  const supervisorName = getSupervisorName(teacher);
+  const supervisorId = getSupervisorId(teacher);
 
   return (
     <div className="space-y-6 mx-auto p-6 pb-10">
+      {/* ── Header ──────────────────────────────────────────────────────────── */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="flex items-center gap-4">
           <Link
@@ -83,41 +91,35 @@ export default function TeacherDetails({
             Teacher Details
           </h1>
         </div>
+
         <div className="flex flex-wrap items-center gap-3">
-          <form
-            onSubmit={handleSubmit((data) => {
-              // TODO: Implement Supabase mutation here
-              console.log("Saving supervisor:", data.supervisor);
-            })}
-            className="flex items-center gap-2"
+          {/* Assign Supervisor button */}
+          <button
+            onClick={() => setAssignModalOpen(true)}
+            className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm font-medium text-[#1A2B4C] hover:bg-gray-50 transition-colors"
           >
-            <select
-              className="px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm font-medium text-[#1A2B4C] focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all cursor-pointer"
-              {...register("supervisor", { required: true })}
-            >
-              <option value="" disabled>
-                Assign Supervisor...
-              </option>
-              <option value="Yusuf M.">Yusuf M.</option>
-              <option value="Ahmed Ali">Ahmed Ali</option>
-              <option value="Fatima Z.">Fatima Z.</option>
-            </select>
-            <button
-              type="submit"
-              className="bg-[#1A2B4C] hover:bg-[#0f192d] text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors disabled:opacity-50"
-              disabled={!supervisorValue}
-            >
-              Save
-            </button>
-          </form>
+            <UserCheck className="w-4 h-4" />
+            {supervisorName ? `Supervisor: ${supervisorName}` : "Assign Supervisor"}
+          </button>
+
           <button className="px-4 py-2 bg-red-50 text-red-600 rounded-lg text-sm font-medium hover:bg-red-100 transition-colors w-fit">
             Delete Teacher
           </button>
         </div>
       </div>
 
+      {/* ── Assign Supervisor Modal ──────────────────────────────────────────── */}
+      <AssignSupervisorModal
+        open={assignModalOpen}
+        onOpenChange={setAssignModalOpen}
+        teacherId={id}
+        teacherName={fullName}
+        currentSupervisorId={supervisorId}
+        currentSupervisorName={supervisorName}
+      />
+
       <div className="grid grid-cols-1 xl:grid-cols-12 gap-6">
-        {/* Main Content Area */}
+        {/* ── Main Content ─────────────────────────────────────────────────── */}
         <div className="xl:col-span-8 space-y-6">
           <div className="bg-white rounded-xl border border-gray-100 p-6 shadow-sm flex flex-col">
             <div className="flex items-center justify-between mb-6">
@@ -141,8 +143,9 @@ export default function TeacherDetails({
           <TeacherSchedule />
         </div>
 
-        {/* Sidebar Info */}
+        {/* ── Sidebar ──────────────────────────────────────────────────────── */}
         <div className="xl:col-span-4 space-y-6">
+          {/* Profile card */}
           <div className="bg-white rounded-xl border border-gray-100 p-6 shadow-sm flex flex-col items-center text-center">
             <div className="w-24 h-24 relative rounded-2xl bg-[#FCEBEB] mb-4 overflow-hidden border-4 border-white shadow-sm flex items-center justify-center">
               {avatarUrl ? (
@@ -183,16 +186,51 @@ export default function TeacherDetails({
                   {joinDate}
                 </span>
               </div>
+              {/* Supervisor row */}
+              <div className="flex justify-between items-center py-2 border-t border-gray-100">
+                <span className="text-sm text-gray-500">Supervisor</span>
+                {supervisorName ? (
+                  <span className="text-sm font-semibold text-[#1A2B4C]">
+                    {supervisorName}
+                  </span>
+                ) : (
+                  <button
+                    onClick={() => setAssignModalOpen(true)}
+                    className="text-xs text-blue-500 hover:underline font-medium"
+                  >
+                    Assign
+                  </button>
+                )}
+              </div>
             </div>
           </div>
 
-          {/* Personal Info with Supervisor & Zoom injected */}
+          {/* Staff Information */}
           <div className="bg-white rounded-xl border border-gray-100 p-6 shadow-sm">
             <h2 className="text-base font-semibold text-[#1A2B4C] mb-6">
               Staff Information
             </h2>
 
             <div className="space-y-5">
+              {/* Supervisor info row */}
+              <InfoRow
+                icon={<Shield className="w-5 h-5" />}
+                label="Supervisor"
+                value={
+                  supervisorName ? (
+                    supervisorName
+                  ) : (
+                    <button
+                      onClick={() => setAssignModalOpen(true)}
+                      className="text-blue-500 hover:underline text-sm font-medium"
+                    >
+                      Assign supervisor
+                    </button>
+                  )
+                }
+                highlight={!!supervisorName}
+              />
+
               <InfoRow
                 icon={<Video className="w-5 h-5" />}
                 label="Zoom Meeting URL"
@@ -207,7 +245,7 @@ export default function TeacherDetails({
                 }
               />
 
-              <div className="border-t border-gray-100 my-4"></div>
+              <div className="border-t border-gray-100 my-4" />
 
               <InfoRow
                 icon={<User className="w-5 h-5" />}
@@ -239,11 +277,17 @@ export default function TeacherDetails({
   );
 }
 
+// ── Helper ────────────────────────────────────────────────────────────────────
+
 function InfoRow({ icon, label, value, highlight = false }: any) {
   return (
     <div className="flex items-start gap-4">
       <div
-        className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${highlight ? "bg-[#1A2B4C] text-white" : "bg-[#E6F1FB] text-[#0C447C]"}`}
+        className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${
+          highlight
+            ? "bg-[#1A2B4C] text-white"
+            : "bg-[#E6F1FB] text-[#0C447C]"
+        }`}
       >
         {icon}
       </div>

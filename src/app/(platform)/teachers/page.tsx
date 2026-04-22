@@ -136,9 +136,8 @@ export default async function TeachersPage() {
     .eq("id", user.id)
     .single();
 
-  // Only admin manages teachers; supervisors view only (optional gate)
   const role = user.user_metadata?.role || profile?.role || "admin";
   if (role === "student") redirect("/dashboard");
 
-  return <TeachersPageClient role={role} />;
+  return <TeachersPageClient role={role} userId={user.id} />;
 }

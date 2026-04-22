@@ -20,7 +20,13 @@ export async function getTeacher(id: string): Promise<TeacherWithProfile | null>
     .from("teachers")
     .select(`
       *,
-      profiles(full_name, photo_url, is_active, created_at)
+      profiles(full_name, photo_url, is_active, created_at),
+      supervisor_assignments(
+        supervisor_id,
+        supervisors(
+          profiles(full_name)
+        )
+      )
     `)
     .eq("id", id)
     .single();
@@ -29,6 +35,6 @@ export async function getTeacher(id: string): Promise<TeacherWithProfile | null>
     if (error.code === "PGRST116") return null; // Not found
     throw new Error(error.message);
   }
-  
+
   return data as TeacherWithProfile;
 }

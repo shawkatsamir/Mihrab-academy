@@ -9,33 +9,9 @@ import { Skeleton } from "@/shared/ui/Skeleton";
 import { TeachersTable } from "@/features/teachers/TeachersTable";
 import { CalendarView, CalendarEvent } from "@/shared/ui/CalendarView";
 import { useSupervisor } from "@/features/supervisors/api/queries";
+import { useTeachersBySupervisor } from "@/features/teachers/api/queries";
 
-// ── Mock data (kept as-is; will be replaced gradually) ──────────────────────
-
-const assignedTeachersMock: any[] = [
-  {
-    id: "1",
-    bio: "Quran Session",
-    price_per_session: 5000,
-    profiles: {
-      full_name: "Omar S.",
-      photo_url: "https://i.pravatar.cc/150?u=t1",
-      is_active: true,
-      created_at: new Date().toISOString(),
-    },
-  },
-  {
-    id: "2",
-    bio: "Arabic Grammar",
-    price_per_session: 4000,
-    profiles: {
-      full_name: "Ali R.",
-      photo_url: "https://i.pravatar.cc/150?u=t3",
-      is_active: true,
-      created_at: new Date().toISOString(),
-    },
-  },
-];
+// ── Mock calendar events (will be replaced gradually) ───────────────────────
 
 const mockEvents: CalendarEvent[] = [
   {
@@ -76,6 +52,8 @@ export default function SupervisorDetails({
 }) {
   const { id } = use(params);
   const { data: supervisor, isLoading } = useSupervisor(id);
+  const { data: assignedTeachers = [], isLoading: loadingTeachers } =
+    useTeachersBySupervisor(id);
 
   // ── Loading state ──────────────────────────────────────────────────────────
   if (isLoading) {
@@ -138,8 +116,8 @@ export default function SupervisorDetails({
               </h2>
             </div>
             <TeachersTable
-              teachers={assignedTeachersMock}
-              isLoading={false}
+              teachers={assignedTeachers}
+              isLoading={loadingTeachers}
               isAdmin={false}
               onEdit={() => {}}
             />
