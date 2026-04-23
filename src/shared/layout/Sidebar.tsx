@@ -70,7 +70,7 @@ export function Sidebar({ role = "admin" }: SidebarProps) {
           name: "Curriculum",
           icon: BookOpen,
           subItems: [
-            { name: "Subjects", path: "/admin/curriculum" },
+            { name: "Subjects", path: "/subjects" },
             { name: "Plan Templates", path: "/admin/study-plans/templates" },
           ],
         },
