@@ -1,10 +1,10 @@
 "use server";
 
 import { createClient as createSupabaseClient } from "@supabase/supabase-js";
-import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
 import type { Database } from "@/lib/supabase/database.types";
 import type { TablesInsert } from "@/lib/supabase/database.types";
+import { requireRole } from "@/lib/auth/getAuthenticatedUser";
 
 const supabaseAdmin = createSupabaseClient<Database>(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -35,23 +35,8 @@ export async function assignSupervisor({
   teacherId: string;
   supervisorId: string;
 }) {
-  // 1. Auth guard — only admins
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) throw new Error("Unauthorized");
-
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("role")
-    .eq("id", user.id)
-    .single();
-
-  const role = user.user_metadata?.role || profile?.role || "admin";
-  if (role !== "admin") {
-    throw new Error("Forbidden: Only admins can assign supervisors");
-  }
+  // Auth guard — only admins, reading role from DB (not user_metadata)
+  const { user } = await requireRole(["admin"]);
 
   // 2. Remove any existing assignment for this teacher
   const { error: deleteErr } = await supabaseAdmin
@@ -84,22 +69,7 @@ export async function assignSupervisor({
  * Only admins can perform this action.
  */
 export async function unassignSupervisor({ teacherId }: { teacherId: string }) {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) throw new Error("Unauthorized");
-
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("role")
-    .eq("id", user.id)
-    .single();
-
-  const role = user.user_metadata?.role || profile?.role || "admin";
-  if (role !== "admin") {
-    throw new Error("Forbidden: Only admins can unassign supervisors");
-  }
+  const { user } = await requireRole(["admin"]);
 
   const { error } = await supabaseAdmin
     .from("supervisor_assignments")
