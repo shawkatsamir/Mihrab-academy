@@ -119,25 +119,12 @@
 //   );
 // }
 
-import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
+import { getAuthenticatedUser } from "@/lib/auth/getAuthenticatedUser";
 import { TeachersPageClient } from "./_components/TeacherPageClient";
 
 export default async function TeachersPage() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) redirect("/login");
-
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("role")
-    .eq("id", user.id)
-    .single();
-
-  const role = user.user_metadata?.role || profile?.role || "admin";
-  if (role === "student") redirect("/dashboard");
+  // Only admin and supervisor can view the teachers list
+  const { user, role } = await getAuthenticatedUser(["admin", "supervisor"]);
 
   return <TeachersPageClient role={role} userId={user.id} />;
 }

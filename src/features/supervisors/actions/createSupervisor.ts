@@ -1,9 +1,9 @@
 "use server";
 
 import { createClient as createSupabaseClient } from "@supabase/supabase-js";
-import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
 import type { Database } from "@/lib/supabase/database.types";
+import { requireRole } from "@/lib/auth/getAuthenticatedUser";
 
 const supabaseAdmin = createSupabaseClient<Database>(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -17,23 +17,8 @@ const supabaseAdmin = createSupabaseClient<Database>(
 );
 
 export async function createSupervisor(formData: FormData) {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) throw new Error("Unauthorized");
-
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("role")
-    .eq("id", user.id)
-    .single();
-
-  const role = user.user_metadata?.role || profile?.role || "admin";
-  if (role !== "admin") {
-    throw new Error("Forbidden: Only admins can create supervisors");
-  }
+  // Auth guard — only admins, reading role from DB (not user_metadata)
+  await requireRole(["admin"]);
 
   const fullName = formData.get("full_name") as string;
   const email = formData.get("email") as string;

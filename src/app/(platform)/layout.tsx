@@ -1,7 +1,20 @@
+import { getAuthenticatedUser } from "@/lib/auth/getAuthenticatedUser";
 import AdminHeader from "@/shared/layout/AdminHeader";
 import { Sidebar } from "@/shared/layout/Sidebar";
 
-export default function Layout({ children }: { children: React.ReactNode }) {
+/**
+ * Platform layout — requires a valid authenticated session.
+ * This is the outermost guard for ALL (platform) routes.
+ * Individual pages perform additional role checks as needed.
+ */
+export default async function Layout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  // Verify session — redirects to /auth/login if no user
+  await getAuthenticatedUser();
+
   return (
     <div className="flex h-screen w-full bg-admin-surface overflow-hidden">
       {/* Sidebar area */}
