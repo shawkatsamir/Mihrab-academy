@@ -59,6 +59,13 @@ export async function createSeries(payload: {
 
   if (error) throw new Error(error.message);
 
+  const { error: genError } = await supabaseAdmin.rpc(
+    "generate_sessions_from_series",
+    { p_lookahead_days: 60 },
+  );
+
+  if (genError) throw new Error(genError.message);
+
   revalidatePath("/sessions");
   revalidatePath("/calendar");
   return data;
