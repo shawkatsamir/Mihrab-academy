@@ -16,9 +16,10 @@ export interface Student {
 
 interface StudentCardProps {
   student: Student;
+  onEdit?: () => void;
 }
 
-export function StudentCard({ student }: StudentCardProps) {
+export function StudentCard({ student, onEdit }: StudentCardProps) {
   return (
     <div className="bg-white rounded-xl border border-gray-100 shadow-sm flex flex-col hover:shadow-md transition-shadow">
       {/* Header */}
@@ -98,7 +99,17 @@ export function StudentCard({ student }: StudentCardProps) {
         >
           View profile
         </Link>
-        <Calendar className="w-5 h-5 text-gray-500" />
+        <div className="flex items-center gap-2">
+          {onEdit && (
+            <button
+              onClick={onEdit}
+              className="text-xs text-gray-500 hover:text-gray-800 font-medium transition-colors"
+            >
+              Edit
+            </button>
+          )}
+          <Calendar className="w-5 h-5 text-gray-500" />
+        </div>
       </div>
     </div>
   );
