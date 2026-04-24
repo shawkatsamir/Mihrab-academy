@@ -11,9 +11,9 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/shared/ui/Dialog";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { Button } from "@/shared/ui/Button";
+import { Input } from "@/shared/ui/Input";
+import { Label } from "@/shared/ui/Label";
 import {
   Select,
   SelectContent,
