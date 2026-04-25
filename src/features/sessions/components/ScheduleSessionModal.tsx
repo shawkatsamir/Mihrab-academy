@@ -4,7 +4,7 @@ import { useState, useMemo } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { format, addMinutes } from "date-fns";
+import { format, addMinutes, startOfDay } from "date-fns";
 import {
   Dialog,
   DialogContent,
@@ -59,6 +59,19 @@ const schema = z
     {
       message: "Select at least one day for recurring sessions",
       path: ["recurrence_days"],
+    },
+  )
+  .refine(
+    (data) => {
+      if (!data.date || !data.time) return true;
+      const [hours, minutes] = data.time.split(":").map(Number);
+      const scheduled = new Date(data.date);
+      scheduled.setHours(hours, minutes, 0, 0);
+      return scheduled > new Date();
+    },
+    {
+      message: "Scheduled time must be in the future",
+      path: ["time"],
     },
   );
 
@@ -189,9 +202,10 @@ export function ScheduleSessionModal({ open, onOpenChange, role }: Props) {
                       selected={watchDate}
                       onSelect={(d) => {
                         form.setValue("date", d as Date);
-                        form.setValue("teacher_id", ""); // reset teacher on date change
+                        form.setValue("teacher_id", "");
+                        if (form.getValues("time")) form.trigger("time");
                       }}
-                      disabled={(date) => date < new Date()}
+                      disabled={(date) => date < startOfDay(new Date())}
                     />
                   </PopoverContent>
                 </Popover>
@@ -209,10 +223,17 @@ export function ScheduleSessionModal({ open, onOpenChange, role }: Props) {
                   type="time"
                   {...form.register("time")}
                   onChange={(e) => {
-                    form.setValue("time", e.target.value);
+                    form.setValue("time", e.target.value, {
+                      shouldValidate: true,
+                    });
                     form.setValue("teacher_id", "");
                   }}
                 />
+                {form.formState.errors.time && (
+                  <p className="text-xs text-red-500">
+                    {form.formState.errors.time.message}
+                  </p>
+                )}
               </div>
             </div>
 
