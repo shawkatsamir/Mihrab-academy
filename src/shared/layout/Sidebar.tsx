@@ -3,31 +3,18 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import {
-  LayoutGrid,
-  Users,
-  GraduationCap,
-  Layers,
-  Video,
-  Calendar,
-  BookOpen,
-  ClipboardList,
-  Star,
-  Folder,
-  Settings,
-  LifeBuoy,
-  ChevronLeft,
-  ChevronRight,
-  ChevronDown,
-  ChevronUp,
-} from "lucide-react";
+import { ChevronLeft, ChevronRight, ChevronDown, ChevronUp, LifeBuoy } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { getNavGroups, getPanelLabel } from "@/lib/auth/nav";
+import type { Database } from "@/lib/supabase/database.types";
+
+type UserRole = Database["public"]["Enums"]["user_role"];
 
 interface SidebarProps {
-  role?: "admin" | "teacher";
+  role: UserRole;
 }
 
-export function Sidebar({ role = "admin" }: SidebarProps) {
+export function Sidebar({ role }: SidebarProps) {
   const [collapsed, setCollapsed] = useState(false);
   const [expandedMenus, setExpandedMenus] = useState<Record<string, boolean>>({
     Staff: true,
@@ -35,116 +22,15 @@ export function Sidebar({ role = "admin" }: SidebarProps) {
   });
 
   const pathname = usePathname();
+  const navGroups = getNavGroups(role);
+  const panelLabel = getPanelLabel(role);
 
   const toggleMenu = (name: string) => {
     setExpandedMenus((prev) => ({ ...prev, [name]: !prev[name] }));
   };
 
-  const adminNavGroups = [
-    {
-      label: "OVERVIEW",
-      items: [{ name: "Dashboard", icon: LayoutGrid, path: "/dashboard" }],
-    },
-    {
-      label: "PEOPLE",
-      items: [
-        {
-          name: "Staff",
-          icon: Users,
-          subItems: [
-            { name: "Teachers", path: "/teachers" },
-            { name: "Supervisors", path: "/supervisors" },
-            { name: "Admins", path: "/admins" },
-          ],
-        },
-        { name: "Students", icon: GraduationCap, path: "/students" },
-        { name: "Age Groups", icon: Layers, path: "/age-groups" },
-      ],
-    },
-    {
-      label: "LEARNING",
-      items: [
-        { name: "Sessions", icon: Video, path: "/sessions", badge: 3 },
-        { name: "Calendar", icon: Calendar, path: "/calendar" },
-        {
-          name: "Curriculum",
-          icon: BookOpen,
-          subItems: [
-            { name: "Subjects", path: "/subjects" },
-            { name: "Plan Templates", path: "/admin/study-plans/templates" },
-          ],
-        },
-      ],
-    },
-    {
-      label: "QUALITY",
-      items: [
-        { name: "Attendance", icon: ClipboardList, path: "/admin/attendance" },
-        { name: "Evaluations", icon: Star, path: "/admin/evaluations" },
-      ],
-    },
-    {
-      label: "CONTENT",
-      items: [
-        { name: "Content Library", icon: Folder, path: "/admin/content" },
-      ],
-    },
-    {
-      label: "SYSTEM",
-      items: [{ name: "Settings", icon: Settings, path: "/admin/settings" }],
-    },
-  ];
-
-  const teacherNavGroups = [
-    {
-      label: "OVERVIEW",
-      items: [{ name: "Dashboard", icon: LayoutGrid, path: "/dashboard" }],
-    },
-    {
-      label: "MY WORK",
-      items: [
-        {
-          name: "My Students",
-          icon: GraduationCap,
-          path: "/teacher/students",
-          badge: 12,
-        },
-        { name: "Sessions", icon: Video, path: "/sessions", badge: 2 },
-        { name: "Calendar", icon: Calendar, path: "/calendar" },
-      ],
-    },
-    {
-      label: "PROGRESS",
-      items: [
-        { name: "Study Plans", icon: BookOpen, path: "/teacher/study-plans" },
-        {
-          name: "Attendance",
-          icon: ClipboardList,
-          path: "/teacher/attendance",
-        },
-      ],
-    },
-    {
-      label: "PROFILE",
-      items: [
-        { name: "My Profile", icon: Users, path: "/profile" },
-        {
-          name: "My Webmail",
-          icon: Folder,
-          path: "https://mail.miharab.com",
-          external: true,
-        },
-      ],
-    },
-  ];
-
-  const navGroups = role === "admin" ? adminNavGroups : teacherNavGroups;
-
-  // Helper to check if a path is active (exact match for root, startsWith for nested)
-  const isActivePath = (path: string, exact: boolean = false) => {
-    if (exact) return pathname === path;
-    return pathname.startsWith(path);
-  };
+  const isActivePath = (path: string, exact = false) =>
+    exact ? pathname === path : pathname.startsWith(path);
 
   return (
     <aside
@@ -157,9 +43,7 @@ export function Sidebar({ role = "admin" }: SidebarProps) {
       <div className="p-6 flex flex-col items-center border-b border-admin-border">
         <div className="flex items-center gap-3 w-full">
           <div className="w-8 h-8 bg-admin-primary rounded flex items-center justify-center shrink-0">
-            <span className="text-white font-arabic font-bold text-lg leading-none">
-              م
-            </span>
+            <span className="text-white font-arabic font-bold text-lg leading-none">م</span>
           </div>
           {!collapsed && (
             <div className="flex flex-col">
@@ -167,7 +51,7 @@ export function Sidebar({ role = "admin" }: SidebarProps) {
                 محراب
               </span>
               <span className="text-[10px] text-admin-text-muted uppercase tracking-wider">
-                {role === "admin" ? "Admin Panel" : "Teacher Panel"}
+                {panelLabel}
               </span>
             </div>
           )}
@@ -184,7 +68,7 @@ export function Sidebar({ role = "admin" }: SidebarProps) {
               </h3>
             )}
             <ul className="space-y-0.5">
-              {group.items.map((item: any, itemIdx) => (
+              {group.items.map((item, itemIdx) => (
                 <li key={itemIdx}>
                   {item.subItems ? (
                     <div>
@@ -211,7 +95,7 @@ export function Sidebar({ role = "admin" }: SidebarProps) {
 
                       {!collapsed && expandedMenus[item.name] && (
                         <ul className="mt-1 mb-2 space-y-0.5">
-                          {item.subItems.map((subItem: any) => {
+                          {item.subItems.map((subItem) => {
                             const active = isActivePath(subItem.path);
                             return (
                               <li key={subItem.name}>
@@ -251,30 +135,28 @@ export function Sidebar({ role = "admin" }: SidebarProps) {
                     </a>
                   ) : (
                     <Link
-                      href={item.path}
+                      href={item.path!}
                       className={cn(
                         "flex items-center gap-3 px-4 py-2 mx-2 rounded-md text-sm font-medium transition-colors group relative",
                         collapsed && "justify-center px-0 mx-2",
-                        isActivePath(item.path, item.path === "/dashboard")
+                        isActivePath(item.path!, item.path === "/dashboard")
                           ? "bg-admin-primary-light text-admin-primary"
                           : "text-admin-text-secondary hover:bg-admin-hover",
                       )}
                       title={collapsed ? item.name : undefined}
                     >
-                      {isActivePath(item.path, item.path === "/dashboard") && (
+                      {isActivePath(item.path!, item.path === "/dashboard") && (
                         <div className="absolute left-0 top-0 bottom-0 w-[3px] bg-admin-primary rounded-r-full -ml-2" />
                       )}
                       <item.icon
                         className={cn(
                           "w-5 h-5 shrink-0",
-                          isActivePath(item.path, item.path === "/dashboard")
+                          isActivePath(item.path!, item.path === "/dashboard")
                             ? "text-admin-primary"
                             : "text-admin-text-secondary",
                         )}
                       />
-                      {!collapsed && (
-                        <span className="flex-1">{item.name}</span>
-                      )}
+                      {!collapsed && <span className="flex-1">{item.name}</span>}
                       {!collapsed && item.badge && (
                         <span className="bg-admin-primary text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[18px] text-center">
                           {item.badge}

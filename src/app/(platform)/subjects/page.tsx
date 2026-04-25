@@ -2,6 +2,6 @@ import { getAuthenticatedUser } from "@/lib/auth/getAuthenticatedUser";
 import { SubjectsPageClient } from "./_components/SubjectsPageClient";
 
 export default async function SubjectsPage() {
-  const { role } = await getAuthenticatedUser();
+  const { role } = await getAuthenticatedUser(["admin", "supervisor"]);
   return <SubjectsPageClient role={role} />;
 }
