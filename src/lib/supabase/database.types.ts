@@ -919,6 +919,7 @@ export type Database = {
       }
       sessions: {
         Row: {
+          auto_completed: boolean
           cancelled_by: string | null
           cancelled_reason: string | null
           completed_at: string | null
@@ -944,6 +945,7 @@ export type Database = {
           zoom_join_url: string | null
         }
         Insert: {
+          auto_completed?: boolean
           cancelled_by?: string | null
           cancelled_reason?: string | null
           completed_at?: string | null
@@ -969,6 +971,7 @@ export type Database = {
           zoom_join_url?: string | null
         }
         Update: {
+          auto_completed?: boolean
           cancelled_by?: string | null
           cancelled_reason?: string | null
           completed_at?: string | null
@@ -1430,6 +1433,72 @@ export type Database = {
           },
         ]
       }
+      teacher_earnings: {
+        Row: {
+          amount_cents: number
+          created_at: string
+          id: string
+          marked_by: string
+          session_id: string
+          status: string
+          teacher_id: string
+        }
+        Insert: {
+          amount_cents: number
+          created_at?: string
+          id?: string
+          marked_by: string
+          session_id: string
+          status?: string
+          teacher_id: string
+        }
+        Update: {
+          amount_cents?: number
+          created_at?: string
+          id?: string
+          marked_by?: string
+          session_id?: string
+          status?: string
+          teacher_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "teacher_earnings_marked_by_fkey"
+            columns: ["marked_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "teacher_earnings_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: true
+            referencedRelation: "sessions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "teacher_earnings_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: true
+            referencedRelation: "v_session_details"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "teacher_earnings_teacher_id_fkey"
+            columns: ["teacher_id"]
+            isOneToOne: false
+            referencedRelation: "teachers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "teacher_earnings_teacher_id_fkey"
+            columns: ["teacher_id"]
+            isOneToOne: false
+            referencedRelation: "v_teacher_performance"
+            referencedColumns: ["teacher_id"]
+          },
+        ]
+      }
       teacher_evaluations: {
         Row: {
           created_at: string
@@ -1696,6 +1765,57 @@ export type Database = {
           thumbnail_url: string | null
         }
         Relationships: []
+      }
+      v_teacher_earnings: {
+        Row: {
+          amount_cents: number | null
+          earned_at: string | null
+          id: string | null
+          scheduled_at: string | null
+          status: string | null
+          student_id: string | null
+          student_name: string | null
+          subject_id: string | null
+          subject_name: string | null
+          teacher_id: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fk_sessions_student"
+            columns: ["student_id"]
+            isOneToOne: false
+            referencedRelation: "students"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_sessions_subject"
+            columns: ["subject_id"]
+            isOneToOne: false
+            referencedRelation: "subjects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_sessions_subject"
+            columns: ["subject_id"]
+            isOneToOne: false
+            referencedRelation: "v_subject_overview"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "teacher_earnings_teacher_id_fkey"
+            columns: ["teacher_id"]
+            isOneToOne: false
+            referencedRelation: "teachers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "teacher_earnings_teacher_id_fkey"
+            columns: ["teacher_id"]
+            isOneToOne: false
+            referencedRelation: "v_teacher_performance"
+            referencedColumns: ["teacher_id"]
+          },
+        ]
       }
       v_teacher_performance: {
         Row: {
