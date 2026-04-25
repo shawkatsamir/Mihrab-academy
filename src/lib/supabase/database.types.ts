@@ -776,6 +776,147 @@ export type Database = {
           },
         ]
       }
+      session_supervisor_evals: {
+        Row: {
+          created_at: string
+          id: string
+          notes_md: string | null
+          rating: number | null
+          session_id: string
+          supervisor_id: string
+          teacher_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          notes_md?: string | null
+          rating?: number | null
+          session_id: string
+          supervisor_id: string
+          teacher_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          notes_md?: string | null
+          rating?: number | null
+          session_id?: string
+          supervisor_id?: string
+          teacher_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "session_supervisor_evals_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "sessions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "session_supervisor_evals_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "v_session_details"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "session_supervisor_evals_supervisor_id_fkey"
+            columns: ["supervisor_id"]
+            isOneToOne: false
+            referencedRelation: "supervisors"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "session_supervisor_evals_teacher_id_fkey"
+            columns: ["teacher_id"]
+            isOneToOne: false
+            referencedRelation: "teachers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "session_supervisor_evals_teacher_id_fkey"
+            columns: ["teacher_id"]
+            isOneToOne: false
+            referencedRelation: "v_teacher_performance"
+            referencedColumns: ["teacher_id"]
+          },
+        ]
+      }
+      session_teacher_evals: {
+        Row: {
+          categories: Json
+          created_at: string
+          id: string
+          is_visible_to_parent: boolean
+          notes_md: string | null
+          session_id: string
+          student_id: string
+          teacher_id: string
+          updated_at: string
+        }
+        Insert: {
+          categories?: Json
+          created_at?: string
+          id?: string
+          is_visible_to_parent?: boolean
+          notes_md?: string | null
+          session_id: string
+          student_id: string
+          teacher_id: string
+          updated_at?: string
+        }
+        Update: {
+          categories?: Json
+          created_at?: string
+          id?: string
+          is_visible_to_parent?: boolean
+          notes_md?: string | null
+          session_id?: string
+          student_id?: string
+          teacher_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "session_teacher_evals_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "sessions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "session_teacher_evals_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "v_session_details"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "session_teacher_evals_student_id_fkey"
+            columns: ["student_id"]
+            isOneToOne: false
+            referencedRelation: "students"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "session_teacher_evals_teacher_id_fkey"
+            columns: ["teacher_id"]
+            isOneToOne: false
+            referencedRelation: "teachers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "session_teacher_evals_teacher_id_fkey"
+            columns: ["teacher_id"]
+            isOneToOne: false
+            referencedRelation: "v_teacher_performance"
+            referencedColumns: ["teacher_id"]
+          },
+        ]
+      }
       sessions: {
         Row: {
           cancelled_by: string | null
@@ -1585,6 +1726,7 @@ export type Database = {
         Args: { p_lookahead_days?: number }
         Returns: number
       }
+      get_my_role: { Args: never; Returns: string }
     }
     Enums: {
       attendance_status: "present" | "absent" | "late"
