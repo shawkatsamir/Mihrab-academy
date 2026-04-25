@@ -2,6 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import { createClient as createSupabaseClient } from "@supabase/supabase-js";
 import { redirect } from "next/navigation";
 import type { Database } from "@/lib/supabase/database.types";
+import { getDefaultRoute } from "@/lib/auth/access";
 
 type UserRole = Database["public"]["Enums"]["user_role"];
 
@@ -51,14 +52,15 @@ export async function getAuthenticatedUser(allowedRoles?: UserRole[]) {
 
   if (!user) redirect("/auth/login");
 
-  // Step 2: read role via admin client — bypasses RLS to avoid recursion
+  // Step 2: read role + full_name via admin client — bypasses RLS to avoid recursion
   const { data: profile } = await supabaseAdmin
     .from("profiles")
-    .select("role")
+    .select("role, full_name")
     .eq("id", user.id)
     .single();
 
   const role = profile?.role as UserRole | null;
+  const fullName = profile?.full_name ?? "";
 
   if (!role) {
     // Profile row missing or role null — kick to login
@@ -66,11 +68,11 @@ export async function getAuthenticatedUser(allowedRoles?: UserRole[]) {
   }
 
   if (allowedRoles && !allowedRoles.includes(role)) {
-    // User is authenticated but lacks permission for this page
-    redirect("/dashboard");
+    // Redirect to the role's own default page to avoid infinite redirect loops
+    redirect(getDefaultRoute(role));
   }
 
-  return { user, role };
+  return { user, role, fullName };
 }
 
 /**
@@ -85,14 +87,15 @@ export async function requireRole(allowedRoles: UserRole[]) {
 
   if (!user) throw new Error("Unauthorized");
 
-  // Read role via admin client — bypasses RLS
+  // Read role + full_name via admin client — bypasses RLS
   const { data: profile } = await supabaseAdmin
     .from("profiles")
-    .select("role")
+    .select("role, full_name")
     .eq("id", user.id)
     .single();
 
   const role = profile?.role as UserRole | null;
+  const fullName = profile?.full_name ?? "";
 
   if (!role) throw new Error("Unauthorized: no role assigned");
 
@@ -100,5 +103,5 @@ export async function requireRole(allowedRoles: UserRole[]) {
     throw new Error(`Forbidden: requires one of [${allowedRoles.join(", ")}]`);
   }
 
-  return { user, role };
+  return { user, role, fullName };
 }
