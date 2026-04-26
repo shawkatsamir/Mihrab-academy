@@ -59,7 +59,7 @@ export async function autoCompleteStaleSessions() {
           status: "present",
           marked_by: s.teacher_id,
         },
-        { onConflict: "session_id,student_id" },
+        { onConflict: "session_id" },
       );
 
     // Accrue salary — same logic as manual completion

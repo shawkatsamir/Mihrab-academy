@@ -12,7 +12,7 @@ const supabaseAdmin = createSupabaseClient<Database>(
 );
 
 export async function markSessionComplete(formData: FormData) {
-  const { user, role } = await requireRole(["teacher", "admin", "supervisor"]);
+  const { user } = await requireRole(["teacher"]);
 
   const sessionId = formData.get("session_id") as string;
   const studentAttendance =
@@ -31,8 +31,7 @@ export async function markSessionComplete(formData: FormData) {
 
   if (sErr || !session) throw new Error("Session not found");
 
-  // Teachers may only complete their own sessions; admins/supervisors can complete any
-  if (role === "teacher" && user.id !== session.teacher_id) {
+  if (user.id !== session.teacher_id) {
     throw new Error("Unauthorized: you can only complete your own sessions");
   }
 
@@ -66,7 +65,7 @@ export async function markSessionComplete(formData: FormData) {
         status: studentAttendance,
         marked_by: user.id,
       },
-      { onConflict: "session_id,student_id" },
+      { onConflict: "session_id" },
     );
 
   if (attErr) throw new Error(attErr.message);
