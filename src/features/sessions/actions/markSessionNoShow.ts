@@ -12,7 +12,7 @@ const supabaseAdmin = createSupabaseClient<Database>(
 );
 
 export async function markSessionNoShow(formData: FormData) {
-  const { user, role } = await requireRole(["teacher", "admin", "supervisor"]);
+  const { user } = await requireRole(["teacher"]);
 
   const sessionId = formData.get("session_id") as string;
   if (!sessionId) throw new Error("Session ID required");
@@ -25,8 +25,7 @@ export async function markSessionNoShow(formData: FormData) {
 
   if (!session) throw new Error("Session not found");
 
-  // Teachers may only mark no-show on their own sessions
-  if (role === "teacher" && user.id !== session.teacher_id) {
+  if (user.id !== session.teacher_id) {
     throw new Error("Unauthorized: you can only mark your own sessions");
   }
 
@@ -58,7 +57,7 @@ export async function markSessionNoShow(formData: FormData) {
         status: "absent",
         marked_by: user.id,
       },
-      { onConflict: "session_id,student_id" },
+      { onConflict: "session_id" },
     );
 
   if (attErr) console.error("Attendance insert failed:", attErr);

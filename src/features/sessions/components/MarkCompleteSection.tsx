@@ -18,10 +18,24 @@ import { markSessionComplete } from "@/features/sessions/actions/markSessionComp
 import { markSessionNoShow } from "@/features/sessions/actions/markSessionNoShow";
 import { useRouter } from "next/navigation";
 import type { SessionDetailRow } from "@/features/sessions/api/queries";
+import { cn } from "@/lib/utils";
+
+const ATTENDANCE_LABEL: Record<string, string> = {
+  present: "Present",
+  late: "Late",
+  absent: "Absent",
+};
+
+const ATTENDANCE_COLOR: Record<string, string> = {
+  present: "text-green-700 bg-green-100",
+  late: "text-amber-700 bg-amber-100",
+  absent: "text-red-700 bg-red-100",
+};
 
 interface Props {
   session: SessionDetailRow;
-  canComplete: boolean; // is teacher or admin
+  /** True only for the teacher who owns this session */
+  canComplete: boolean;
 }
 
 export function MarkCompleteCard({ session, canComplete }: Props) {
@@ -33,65 +47,50 @@ export function MarkCompleteCard({ session, canComplete }: Props) {
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
-  const start = session.scheduled_at ? new Date(session.scheduled_at) : null;
-  const end = start
-    ? new Date(start.getTime() + (session.duration_minutes ?? 45) * 60000)
-    : null;
-  const now = new Date();
-  const isPastEnd = end ? now > end : false;
+  // ── Terminal status — visible to all roles ──────────────────────────────
 
-  const handleComplete = async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const formData = new FormData();
-      formData.append("session_id", session.id!);
-      formData.append("student_attendance", studentStatus);
-      formData.append("notes_md", notes);
-      await markSessionComplete(formData);
-      router.refresh();
-    } catch (err: any) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleNoShow = async () => {
-    if (
-      !confirm(
-        "Mark this session as student no-show? Teacher will not be paid.",
-      )
-    )
-      return;
-    setLoading(true);
-    try {
-      const formData = new FormData();
-      formData.append("session_id", session.id!);
-      formData.append("no_show_student", "true");
-      await markSessionNoShow(formData);
-      router.refresh();
-    } catch (err: any) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  if (!canComplete) return null;
   if (session.status === "completed") {
     return (
       <Card className="border-green-200 bg-green-50">
-        <CardContent className="py-4 flex items-center gap-3">
-          <CheckCircle className="h-5 w-5 text-green-600" />
-          <div>
-            <p className="font-medium text-green-800">Session Completed</p>
-            <p className="text-xs text-green-700">
-              {session.completed_at
-                ? format(new Date(session.completed_at), "PPp")
-                : "-"}
-            </p>
-          </div>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-sm flex items-center gap-2 text-green-800">
+            <CheckCircle className="h-4 w-4 text-green-600" />
+            Session Completed
+            {session.completed_at && (
+              <span className="text-xs font-normal text-green-700 ml-auto">
+                {format(new Date(session.completed_at), "PPp")}
+              </span>
+            )}
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="pt-0 space-y-3">
+          {session.attendance_status && (
+            <div className="flex items-center gap-2 text-sm">
+              <span className="text-green-700 font-medium">
+                Student Attendance:
+              </span>
+              <span
+                className={cn(
+                  "text-xs font-semibold px-2 py-0.5 rounded-full capitalize",
+                  ATTENDANCE_COLOR[session.attendance_status] ??
+                    "text-gray-700 bg-gray-100",
+                )}
+              >
+                {ATTENDANCE_LABEL[session.attendance_status] ??
+                  session.attendance_status}
+              </span>
+            </div>
+          )}
+          {session.teacher_notes_md && (
+            <div className="space-y-1">
+              <p className="text-xs font-semibold text-green-700 uppercase tracking-wide">
+                Session Notes
+              </p>
+              <p className="text-sm text-green-900 whitespace-pre-wrap">
+                {session.teacher_notes_md}
+              </p>
+            </div>
+          )}
         </CardContent>
       </Card>
     );
@@ -108,8 +107,55 @@ export function MarkCompleteCard({ session, canComplete }: Props) {
     );
   }
 
-  if (session.status === "cancelled" || session.status === "shifted")
+  if (session.status === "cancelled" || session.status === "shifted") {
     return null;
+  }
+
+  // ── Action form — teacher only ──────────────────────────────────────────
+
+  if (!canComplete) return null;
+
+  const start = session.scheduled_at ? new Date(session.scheduled_at) : null;
+  const end = start
+    ? new Date(start.getTime() + (session.duration_minutes ?? 45) * 60000)
+    : null;
+  const isPastEnd = end ? new Date() > end : false;
+
+  const handleComplete = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const formData = new FormData();
+      formData.append("session_id", session.id!);
+      formData.append("student_attendance", studentStatus);
+      formData.append("notes_md", notes);
+      await markSessionComplete(formData);
+      router.refresh();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Something went wrong");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleNoShow = async () => {
+    if (
+      !confirm("Mark this session as student no-show? Teacher will not be paid.")
+    )
+      return;
+    setLoading(true);
+    try {
+      const formData = new FormData();
+      formData.append("session_id", session.id!);
+      formData.append("no_show_student", "true");
+      await markSessionNoShow(formData);
+      router.refresh();
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <Card>
@@ -126,8 +172,8 @@ export function MarkCompleteCard({ session, canComplete }: Props) {
             <div>
               <p className="font-medium">Session still in progress</p>
               <p className="text-xs">
-                Scheduled to end at {end ? format(end, "h:mm a") : "-"}. You can
-                mark complete early if the session finished ahead of time.
+                Scheduled to end at {end ? format(end, "h:mm a") : "-"}. You
+                can mark complete early if the session finished ahead of time.
               </p>
             </div>
           </div>
@@ -185,8 +231,8 @@ export function MarkCompleteCard({ session, canComplete }: Props) {
 
         {studentStatus === "absent" && (
           <p className="text-xs text-muted-foreground">
-            Select "Absent" and click "Student No-Show" to record a no-show. No
-            payment will be issued.
+            Select &quot;Absent&quot; and click &quot;Student No-Show&quot; to
+            record a no-show. No payment will be issued.
           </p>
         )}
       </CardContent>
