@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { useForm, Controller } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { format, addMinutes, startOfDay } from "date-fns";
@@ -21,7 +21,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/shared/ui/Select";
-import { Textarea } from "@/shared/ui/Textarea";
 import { Calendar } from "@/shared/ui/Calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/shared/ui/Popover";
 import { CalendarIcon, Loader2 } from "lucide-react";
@@ -38,9 +37,9 @@ import { cn } from "@/lib/utils";
 
 const schema = z
   .object({
-    date: z.date({ required_error: "Select a date" }),
+    date: z.date({ message: "Select a date" }),
     time: z.string().regex(/^([01]\d|2[0-3]):([0-5]\d)$/, "Invalid time"),
-    duration_minutes: z.coerce.number().min(15).max(180).default(45),
+    duration_minutes: z.number().min(15).max(180),
     student_id: z.string().uuid("Select a student"),
     subject_id: z.string().uuid("Select a subject"),
     teacher_id: z.string().uuid("Select a teacher"),
@@ -80,11 +79,9 @@ type FormValues = z.infer<typeof schema>;
 interface Props {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  role: "admin" | "supervisor";
 }
 
-export function ScheduleSessionModal({ open, onOpenChange, role }: Props) {
-  const [step, setStep] = useState<1 | 2 | 3>(1);
+export function ScheduleSessionModal({ open, onOpenChange }: Props) {
   const [error, setError] = useState<string | null>(null);
 
   const { data: students = [] } = useStudents();
@@ -160,10 +157,9 @@ export function ScheduleSessionModal({ open, onOpenChange, role }: Props) {
       }
 
       form.reset();
-      setStep(1);
       onOpenChange(false);
-    } catch (err: any) {
-      setError(err.message ?? "Failed to schedule");
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Failed to schedule");
     }
   };
 
@@ -245,7 +241,7 @@ export function ScheduleSessionModal({ open, onOpenChange, role }: Props) {
                 step={5}
                 min={15}
                 max={180}
-                {...form.register("duration_minutes")}
+                {...form.register("duration_minutes", { valueAsNumber: true })}
               />
             </div>
           </div>
@@ -486,7 +482,6 @@ export function ScheduleSessionModal({ open, onOpenChange, role }: Props) {
               variant="outline"
               onClick={() => {
                 form.reset();
-                setStep(1);
                 onOpenChange(false);
               }}
             >

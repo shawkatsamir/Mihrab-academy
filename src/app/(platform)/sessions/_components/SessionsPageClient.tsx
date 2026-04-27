@@ -164,7 +164,6 @@ export function SessionsPageClient({ role }: Props) {
         <ScheduleSessionModal
           open={scheduleOpen}
           onOpenChange={setScheduleOpen}
-          role={role as "admin" | "supervisor"}
         />
       )}
     </div>

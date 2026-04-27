@@ -21,11 +21,9 @@ import { useRouter } from "next/navigation";
 interface Props {
   teachers: TeacherWithProfile[];
   isLoading: boolean;
-  isAdmin: boolean;
-  onEdit: (teacher: TeacherWithProfile) => void;
 }
 
-export function TeachersTable({ teachers, isLoading, isAdmin, onEdit }: Props) {
+export function TeachersTable({ teachers, isLoading }: Props) {
   const router = useRouter();
 
   if (isLoading) {

@@ -11,10 +11,13 @@ import type { SessionDetailRow } from "@/features/sessions/api/queries";
 
 interface Props {
   session: SessionDetailRow;
-  existingEval?: any;
+  existingEval?: {
+    rating?: number | null;
+    notes_md?: string | null;
+  } | null;
   readOnly?: boolean;
   userId?: string;
-  onSaved?: (data: any) => void;
+  onSaved?: (data: { rating: number; notes_md: string }) => void;
 }
 
 export function SupervisorEvalSection({
@@ -60,12 +63,12 @@ export function SupervisorEvalSection({
         {readOnly ? (
           <div className="space-y-3">
             <StarInput
-              value={existingEval.rating}
+              value={existingEval?.rating ?? 0}
               onChange={() => {}}
               readOnly
               size={24}
             />
-            {existingEval.notes_md && (
+            {existingEval?.notes_md && (
               <p className="text-sm whitespace-pre-wrap text-muted-foreground">
                 {existingEval.notes_md}
               </p>

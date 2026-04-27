@@ -11,10 +11,10 @@ interface Props {
   isAdmin: boolean;
 }
 
-function toCardProps(row: ReturnType<typeof useStudents>["data"][number]): Student {
+function toCardProps(row: NonNullable<ReturnType<typeof useStudents>["data"]>[number]): Student {
   const profiles = Array.isArray(row.profiles) ? row.profiles[0] : row.profiles;
   const ageGroup = Array.isArray(row.age_groups) ? row.age_groups[0] : row.age_groups;
-  const subjects = (row.student_subjects ?? []).flatMap((ss: any) =>
+  const subjects = (row.student_subjects ?? []).flatMap((ss: { subjects?: unknown }) =>
     Array.isArray(ss.subjects) ? ss.subjects : [ss.subjects],
   ).filter(Boolean);
 
@@ -43,7 +43,7 @@ export function StudentsPageClient({ isAdmin }: Props) {
   const { data: students = [], isLoading } = useStudents();
   const [search, setSearch] = useState("");
   const [modalOpen, setModalOpen] = useState(false);
-  const [editStudent, setEditStudent] = useState<any>(null);
+  const [editStudent, setEditStudent] = useState<NonNullable<ReturnType<typeof useStudents>["data"]>[number] | null>(null);
 
   const filtered = students.filter((s) => {
     const profiles = Array.isArray(s.profiles) ? s.profiles[0] : s.profiles;

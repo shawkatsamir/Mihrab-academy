@@ -36,8 +36,6 @@ function SupervisorView({ userId }: { userId: string }) {
       <TeachersTable
         teachers={teachers}
         isLoading={isLoading}
-        isAdmin={false}
-        onEdit={() => {}}
       />
     </div>
   );
@@ -64,11 +62,6 @@ function AdminView() {
       <TeachersTable
         teachers={teachers}
         isLoading={isLoading}
-        isAdmin={true}
-        onEdit={(t) => {
-          setEditTeacher(t);
-          setModalOpen(true);
-        }}
       />
 
       <TeacherFormModal

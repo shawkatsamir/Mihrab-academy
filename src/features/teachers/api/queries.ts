@@ -3,7 +3,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { createClient } from "@/lib/supabase/client";
 import { teacherKeys } from "./keys";
-import type { Tables, TablesInsert } from "@/lib/supabase/database.types";
+import type { Tables } from "@/lib/supabase/database.types";
 
 // ─── Types derived from DB schema (no manual duplication) ─────────────────────
 
@@ -87,7 +87,7 @@ export function useAssignSupervisor() {
 
   return useMutation({
     mutationFn: assignSupervisor,
-    onSuccess: (_data, variables) => {
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: teacherKeys.all });
     },
   });
@@ -101,6 +101,23 @@ export function useUnassignSupervisor() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: teacherKeys.all });
     },
+  });
+}
+
+// ─── Teacher sessions hook ─────────────────────────────────────────────────────
+
+import { getTeacherSessions } from "../actions/getTeacherSessions";
+import type { SessionDetailRow } from "@/features/sessions/api/queries";
+
+export function useTeacherSessions(
+  teacherId: string,
+  range?: { start: string; end: string },
+) {
+  return useQuery({
+    queryKey: teacherKeys.sessions(teacherId, range),
+    queryFn: () =>
+      getTeacherSessions(teacherId, range) as Promise<SessionDetailRow[]>,
+    enabled: !!teacherId,
   });
 }
 

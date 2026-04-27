@@ -12,9 +12,13 @@ import type { SessionDetailRow } from "@/features/sessions/api/queries";
 
 interface Props {
   session: SessionDetailRow;
-  existingRating?: any;
+  existingRating?: {
+    rating?: number | null;
+    comment?: string | null;
+    submitted_at?: string | null;
+  } | null;
   readOnly?: boolean;
-  onSaved?: (data: any) => void;
+  onSaved?: (data: { rating: number; comment: string; submitted_at: string }) => void;
 }
 
 export function ParentRatingSection({
@@ -61,21 +65,21 @@ export function ParentRatingSection({
           <div className="space-y-3 text-center">
             <div className="flex justify-center">
               <StarInput
-                value={existingRating.rating}
+                value={existingRating?.rating ?? 0}
                 onChange={() => {}}
                 readOnly
                 size={32}
               />
             </div>
             <p className="text-2xl font-bold">
-              {existingRating.rating}.0 / 5.0
+              {existingRating?.rating ?? 0}.0 / 5.0
             </p>
-            {existingRating.comment && (
+            {existingRating?.comment && (
               <p className="text-muted-foreground italic">
                 &ldquo;{existingRating.comment}&rdquo;
               </p>
             )}
-            {existingRating.submitted_at && (
+            {existingRating?.submitted_at && (
               <p className="text-xs text-muted-foreground">
                 Submitted{" "}
                 {format(new Date(existingRating.submitted_at), "MMM d, yyyy")}
