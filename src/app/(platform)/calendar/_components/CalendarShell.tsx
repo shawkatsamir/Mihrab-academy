@@ -46,7 +46,6 @@ const VIEWS: { value: ViewType; label: string; icon: React.ReactNode }[] = [
 
 interface Props {
   sessions: SessionDetailRow[];
-  isLoading: boolean;
   role: string;
   onRangeChange: (range: { start: string; end: string }) => void;
 }
@@ -62,10 +61,10 @@ function EventCard({ info }: { info: EventContentArg }) {
   let bg = "bg-blue-50 text-blue-800 border-blue-200";
   if (session.status === "cancelled" || session.status === "shifted")
     bg = "bg-gray-100 text-gray-500 border-gray-200 opacity-60";
+  else if (session.is_exception)
+    bg = "bg-purple-50 text-purple-800 border-purple-200";
   else if (session.session_type === "one_time")
     bg = "bg-amber-50 text-amber-800 border-amber-200";
-  else if (session.shifted_from_session_id)
-    bg = "bg-purple-50 text-purple-800 border-purple-200";
 
   return (
     <div
@@ -81,7 +80,7 @@ function EventCard({ info }: { info: EventContentArg }) {
   );
 }
 
-export function CalendarShell({ sessions, isLoading, onRangeChange }: Props) {
+export function CalendarShell({ sessions, onRangeChange }: Props) {
   const calendarRef = useRef<FullCalendar>(null);
   const [activeView, setActiveView] = useState<ViewType>("dayGridMonth");
   const router = useRouter();
@@ -178,24 +177,26 @@ export function CalendarShell({ sessions, isLoading, onRangeChange }: Props) {
           initialView="dayGridMonth"
           headerToolbar={false}
           events={events}
-          loading={isLoading}
           eventClick={handleEventClick}
           datesSet={handleDatesSet}
           eventContent={(info) => <EventCard info={info} />}
           height="auto"
-          slotMinTime="06:00:00"
-          slotMaxTime="23:00:00"
+          timeZone="local"
+          slotMinTime="00:00:00"
+          slotMaxTime="24:00:00"
+          slotEventOverlap={false}
+          eventMinHeight={28}
           dayHeaderFormat={{ weekday: "short", day: "numeric" }}
           eventTimeFormat={{
             hour: "numeric",
             minute: "2-digit",
             meridiem: "short",
           }}
-          noEventsContent={
+          noEventsContent={() => (
             <div className="py-12 text-center text-sm text-gray-500">
               No sessions scheduled
             </div>
-          }
+          )}
         />
       </div>
     </div>

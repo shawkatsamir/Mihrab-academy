@@ -27,12 +27,11 @@ export function CalendarPageClient({ role }: Props) {
     end: new Date().toISOString(),
   });
 
-  const { data: sessions = [], isLoading } = useSessions(range);
+  const { data: sessions = [] } = useSessions(range);
 
   return (
     <CalendarShell
       sessions={sessions}
-      isLoading={isLoading}
       role={role}
       onRangeChange={setRange}
     />
