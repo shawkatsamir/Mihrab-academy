@@ -13,9 +13,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/shared/ui/Select";
-import { CheckCircle, XCircle, Clock, AlertTriangle } from "lucide-react";
+import { CheckCircle, XCircle, Clock, AlertTriangle, Info } from "lucide-react";
 import { markSessionComplete } from "@/features/sessions/actions/markSessionComplete";
-import { markSessionNoShow } from "@/features/sessions/actions/markSessionNoShow";
 import { useRouter } from "next/navigation";
 import type { SessionDetailRow } from "@/features/sessions/api/queries";
 import { cn } from "@/lib/utils";
@@ -47,7 +46,7 @@ export function MarkCompleteCard({ session, canComplete }: Props) {
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
-  // ── Terminal status — visible to all roles ──────────────────────────────
+  // ── Terminal: completed ─────────────────────────────────────────────────
 
   if (session.status === "completed") {
     return (
@@ -96,12 +95,28 @@ export function MarkCompleteCard({ session, canComplete }: Props) {
     );
   }
 
+  // ── Terminal: no_show (legacy records) ─────────────────────────────────
+
   if (session.status === "no_show") {
     return (
       <Card className="border-orange-200 bg-orange-50">
-        <CardContent className="py-4 flex items-center gap-3">
-          <XCircle className="h-5 w-5 text-orange-600" />
-          <p className="font-medium text-orange-800">Marked as No-Show</p>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-sm flex items-center gap-2 text-orange-800">
+            <XCircle className="h-4 w-4 text-orange-600" />
+            Student Absent — Session Counted &amp; Paid
+            {session.completed_at && (
+              <span className="text-xs font-normal text-orange-700 ml-auto">
+                {format(new Date(session.completed_at), "PPp")}
+              </span>
+            )}
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="pt-0">
+          <p className="text-sm text-orange-700">
+            The student did not attend. The teacher completed the mandatory
+            30-minute waiting period and has been compensated accordingly. This
+            session is included in the total session count.
+          </p>
         </CardContent>
       </Card>
     );
@@ -138,25 +153,6 @@ export function MarkCompleteCard({ session, canComplete }: Props) {
     }
   };
 
-  const handleNoShow = async () => {
-    if (
-      !confirm("Mark this session as student no-show? Teacher will not be paid.")
-    )
-      return;
-    setLoading(true);
-    try {
-      const formData = new FormData();
-      formData.append("session_id", session.id!);
-      formData.append("no_show_student", "true");
-      await markSessionNoShow(formData);
-      router.refresh();
-    } catch (err: any) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   return (
     <Card>
       <CardHeader>
@@ -183,7 +179,7 @@ export function MarkCompleteCard({ session, canComplete }: Props) {
           <Label>Student Attendance</Label>
           <Select
             value={studentStatus}
-            onValueChange={(v) => setStudentStatus(v as any)}
+            onValueChange={(v) => setStudentStatus(v as "present" | "absent" | "late")}
           >
             <SelectTrigger>
               <SelectValue />
@@ -196,45 +192,54 @@ export function MarkCompleteCard({ session, canComplete }: Props) {
           </Select>
         </div>
 
+        {/* Policy banner — shown only when teacher marks student as absent */}
+        {studentStatus === "absent" && (
+          <div className="flex items-start gap-2 rounded-md bg-blue-50 border border-blue-200 p-3 text-sm text-blue-800">
+            <Info className="h-4 w-4 mt-0.5 shrink-0 text-blue-600" />
+            <div className="space-y-1">
+              <p className="font-medium">Absent student — session still paid</p>
+              <p className="text-xs text-blue-700">
+                Per academy policy, the teacher waits a mandatory 30 minutes for
+                the student. The session will be marked as completed, counted in
+                the total, and the teacher will be compensated in full.
+              </p>
+              <p className="text-xs text-blue-600 font-medium mt-1">
+                If the parent notified you in advance that the student
+                wouldn&apos;t attend, cancel the session instead of completing
+                it.
+              </p>
+            </div>
+          </div>
+        )}
+
         <div className="space-y-2">
           <Label>Session Notes</Label>
           <Textarea
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
-            placeholder="What was covered? Any homework assigned?"
+            placeholder={
+              studentStatus === "absent"
+                ? "Note that the student was absent and you waited the required 30 minutes."
+                : "What was covered? Any homework assigned?"
+            }
             rows={3}
           />
         </div>
 
         {error && <p className="text-sm text-red-500">{error}</p>}
 
-        <div className="flex flex-col gap-2 sm:flex-row">
-          <Button
-            className="flex-1"
-            onClick={handleComplete}
-            disabled={loading || studentStatus === "absent"}
-          >
-            <CheckCircle className="h-4 w-4 mr-2" />
-            {loading ? "Saving..." : "Mark as Complete"}
-          </Button>
-
-          <Button
-            variant="outline"
-            className="flex-1"
-            onClick={handleNoShow}
-            disabled={loading}
-          >
-            <XCircle className="h-4 w-4 mr-2" />
-            Student No-Show
-          </Button>
-        </div>
-
-        {studentStatus === "absent" && (
-          <p className="text-xs text-muted-foreground">
-            Select &quot;Absent&quot; and click &quot;Student No-Show&quot; to
-            record a no-show. No payment will be issued.
-          </p>
-        )}
+        <Button
+          className="w-full"
+          onClick={handleComplete}
+          disabled={loading}
+        >
+          <CheckCircle className="h-4 w-4 mr-2" />
+          {loading
+            ? "Saving..."
+            : studentStatus === "absent"
+              ? "Mark as Complete (Student Absent)"
+              : "Mark as Complete"}
+        </Button>
       </CardContent>
     </Card>
   );

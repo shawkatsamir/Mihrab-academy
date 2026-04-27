@@ -18,9 +18,12 @@ export type SessionDetailRow = Tables<"v_session_details">;
 /** Adds fields from the raw `sessions` table that are absent from the view */
 export type EnrichedSessionRow = SessionDetailRow & {
   shift_reason: string | null;
+  shifted_at: string | null;
   cancelled_reason: string | null;
   shifted_from_session_id: string | null;
+  shifted_to_session_id: string | null;
   created_by: string | null;
+  created_by_name: string | null;
 };
 
 export function useSessions(range?: { start: string; end: string }) {

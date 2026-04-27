@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import dynamic from "next/dynamic";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { format } from "date-fns";
@@ -8,13 +9,54 @@ import { StudentProfileCard } from "@/features/students/components/StudentProfil
 import { PersonalInfoCard } from "@/features/students/components/PersonalInfoCard";
 import { GuardianInfoCard } from "@/features/students/components/GuardianInfoCard";
 import { AchievementsCard } from "@/features/students/components/AchievementsCard";
-import { AcademicPerformance } from "@/features/students/components/AcademicPerformance";
 import { EnrolledCourses } from "@/features/students/components/EnrolledCourses";
 import { AttendanceCalendar } from "@/features/students/components/AttendanceCalendar";
-import { ScheduleSessions } from "@/features/students/components/ScheduleSessions";
-import { AssignSubjectsForm } from "@/features/students/components/AssignSubjectsForm";
+
+// Below-the-fold heavy components — deferred to keep the student profile card
+// visible immediately without waiting for FullCalendar / recharts / zod to compile.
+const AcademicPerformance = dynamic(
+  () =>
+    import("@/features/students/components/AcademicPerformance").then((m) => ({
+      default: m.AcademicPerformance,
+    })),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="h-[300px] w-full animate-pulse rounded-xl bg-white border border-gray-100" />
+    ),
+  },
+);
+
+const ScheduleSessions = dynamic(
+  () =>
+    import("@/features/students/components/ScheduleSessions").then((m) => ({
+      default: m.ScheduleSessions,
+    })),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="h-[400px] w-full animate-pulse rounded-xl bg-white border border-gray-100" />
+    ),
+  },
+);
+
+const AssignSubjectsForm = dynamic(
+  () =>
+    import("@/features/students/components/AssignSubjectsForm").then((m) => ({
+      default: m.AssignSubjectsForm,
+    })),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="h-24 w-full animate-pulse rounded-xl bg-white border border-gray-100" />
+    ),
+  },
+);
 
 // ─── Mock data (kept intact — will be replaced one by one) ────────────────────
+type AttendanceStatus = "present" | "absent" | "late" | "sick";
+type AttendanceRecord = { date: string; status: AttendanceStatus };
+
 const MOCK_ACHIEVEMENTS = [
   { id: 1, title: "Hifz Milestone: Juz 30", description: "Completed with Excellence" },
 ];
@@ -34,12 +76,12 @@ const MOCK_ACADEMIC = {
     "Consistent excellence in Tajweed studies and dedication in memorization.",
 };
 
-const MOCK_ATTENDANCE = [
-  { date: "2025-03-02", status: "sick" as const },
-  { date: "2025-03-05", status: "late" as const },
-  { date: "2025-03-07", status: "present" as const },
-  { date: "2025-03-13", status: "present" as const },
-  { date: "2025-03-14", status: "sick" as const },
+const MOCK_ATTENDANCE: AttendanceRecord[] = [
+  { date: "2025-03-02", status: "sick" },
+  { date: "2025-03-05", status: "late" },
+  { date: "2025-03-07", status: "present" },
+  { date: "2025-03-13", status: "present" },
+  { date: "2025-03-14", status: "sick" },
 ];
 
 // ─── Props ────────────────────────────────────────────────────────────────────
@@ -73,7 +115,7 @@ export function StudentDetailClient({ student }: Props) {
 
   const handleAttendanceChange = (
     date: string,
-    status: "present" | "late" | "sick" | "absent" | "none",
+    status: AttendanceStatus | "none",
   ) => {
     if (status === "none") {
       setAttendanceRecords((prev) => prev.filter((r) => r.date !== date));

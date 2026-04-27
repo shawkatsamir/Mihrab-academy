@@ -1,10 +1,18 @@
 "use client";
 
 import { useState } from "react";
+import dynamic from "next/dynamic";
 import { SessionsTable } from "@/features/sessions/components/SessionsTable";
-import { ShiftSessionModal } from "@/features/sessions/components/ShiftSessionModal";
-import { CancelSessionModal } from "@/features/sessions/components/CancelSessionModal";
 import type { SessionDetailRow } from "@/features/sessions/api/queries";
+
+const ShiftSessionModal = dynamic(
+  () => import("@/features/sessions/components/ShiftSessionModal").then((m) => ({ default: m.ShiftSessionModal })),
+  { ssr: false },
+);
+const CancelSessionModal = dynamic(
+  () => import("@/features/sessions/components/CancelSessionModal").then((m) => ({ default: m.CancelSessionModal })),
+  { ssr: false },
+);
 
 interface Props {
   sessions: SessionDetailRow[];

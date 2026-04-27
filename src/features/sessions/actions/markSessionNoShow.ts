@@ -19,7 +19,7 @@ export async function markSessionNoShow(formData: FormData) {
 
   const { data: session } = await supabaseAdmin
     .from("sessions")
-    .select("teacher_id, student_id, status")
+    .select("teacher_id, student_id, status, teachers(price_per_session)")
     .eq("id", sessionId)
     .single();
 
@@ -62,7 +62,24 @@ export async function markSessionNoShow(formData: FormData) {
 
   if (attErr) console.error("Attendance insert failed:", attErr);
 
+  // Teacher waited the mandatory 30-minute window — session is paid regardless of attendance.
+  const priceInDollars = session.teachers?.price_per_session ?? 0;
+  const amountCents = Math.round(priceInDollars * 100);
+
+  if (amountCents > 0) {
+    const { error: earnErr } = await supabaseAdmin
+      .from("teacher_earnings")
+      .insert({
+        teacher_id: session.teacher_id,
+        session_id: sessionId,
+        amount_cents: amountCents,
+        marked_by: user.id,
+      });
+    if (earnErr) console.error("Earnings insert failed:", earnErr);
+  }
+
   revalidatePath(`/sessions/${sessionId}`);
   revalidatePath("/sessions");
+  revalidatePath("/dashboard");
   return { success: true };
 }

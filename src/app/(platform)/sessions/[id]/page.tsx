@@ -80,7 +80,7 @@ export default async function SessionDetailPage({
   // Verify the caller is allowed to view this session before fetching all data
   await assertSessionAccess(id, user.id, role);
 
-  const [viewRes, rawRes, teacherEval, supervisorEval, parentRating] =
+  const [viewRes, rawRes, shiftedToRes, teacherEval, supervisorEval, parentRating] =
     await Promise.all([
       supabaseAdmin
         .from("v_session_details")
@@ -90,10 +90,16 @@ export default async function SessionDetailPage({
       supabaseAdmin
         .from("sessions")
         .select(
-          "shift_reason, cancelled_reason, shifted_from_session_id, created_by",
+          "shift_reason, shifted_at, cancelled_reason, shifted_from_session_id, created_by",
         )
         .eq("id", id)
         .single(),
+      supabaseAdmin
+        .from("sessions")
+        .select("id")
+        .eq("shifted_from_session_id", id)
+        .maybeSingle()
+        .then((r) => r.data?.id ?? null),
       supabaseAdmin
         .from("session_teacher_evals")
         .select("*")
@@ -116,12 +122,26 @@ export default async function SessionDetailPage({
 
   if (!viewRes.data) notFound();
 
+  const createdById = rawRes.data?.created_by ?? null;
+  let createdByName: string | null = null;
+  if (createdById) {
+    const { data: profile } = await supabaseAdmin
+      .from("profiles")
+      .select("full_name")
+      .eq("id", createdById)
+      .single();
+    createdByName = profile?.full_name ?? null;
+  }
+
   const session: EnrichedSessionRow = {
     ...viewRes.data,
     shift_reason: rawRes.data?.shift_reason ?? null,
+    shifted_at: rawRes.data?.shifted_at ?? null,
     cancelled_reason: rawRes.data?.cancelled_reason ?? null,
     shifted_from_session_id: rawRes.data?.shifted_from_session_id ?? null,
-    created_by: rawRes.data?.created_by ?? null,
+    shifted_to_session_id: shiftedToRes,
+    created_by: createdById,
+    created_by_name: createdByName,
   };
 
   return (

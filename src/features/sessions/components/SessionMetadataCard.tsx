@@ -10,6 +10,9 @@ interface Props {
 }
 
 export function SessionMetadataCard({ session }: Props) {
+  const isShifted = !!session.shifted_from_session_id;
+  const isCancelled = session.status === "cancelled";
+
   return (
     <Card>
       <CardHeader className="pb-3">
@@ -37,18 +40,41 @@ export function SessionMetadataCard({ session }: Props) {
 
         {session.created_at && (
           <div>
-            <p className="text-xs text-muted-foreground">Scheduled on</p>
+            <p className="text-xs text-muted-foreground">
+              {isShifted ? "Rescheduled on" : "Scheduled on"}
+            </p>
             <p className="font-medium">
               {format(new Date(session.created_at), "MMM d, yyyy")}
             </p>
           </div>
         )}
 
-        {session.shift_reason && (
-          <div className="col-span-2 sm:col-span-3">
-            <p className="text-xs text-muted-foreground">Shift Reason</p>
-            <p className="font-medium">{session.shift_reason}</p>
-          </div>
+        {/* Shift metadata — only shown on the new (rescheduled) session, never on cancelled */}
+        {isShifted && !isCancelled && (
+          <>
+            {session.shift_reason && (
+              <div className="col-span-2 sm:col-span-3">
+                <p className="text-xs text-muted-foreground">Shift Reason</p>
+                <p className="font-medium">{session.shift_reason}</p>
+              </div>
+            )}
+
+            {session.created_by_name && (
+              <div>
+                <p className="text-xs text-muted-foreground">Shifted by</p>
+                <p className="font-medium">{session.created_by_name}</p>
+              </div>
+            )}
+
+            {session.shifted_at && (
+              <div>
+                <p className="text-xs text-muted-foreground">Shifted at</p>
+                <p className="font-medium">
+                  {format(new Date(session.shifted_at), "MMM d, yyyy · h:mm a")}
+                </p>
+              </div>
+            )}
+          </>
         )}
 
         {session.cancelled_reason && (

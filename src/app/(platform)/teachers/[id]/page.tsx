@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, use } from "react";
+import dynamic from "next/dynamic";
 import Link from "next/link";
 import { format } from "date-fns";
 import {
@@ -13,7 +14,6 @@ import {
   UserCheck,
   Shield,
 } from "lucide-react";
-import TeacherWorkloadAreaChart from "@/features/teachers/TeacherWorkloadAreaChart";
 import { Img } from "@/shared/ui/Image";
 import { Skeleton } from "@/shared/ui/Skeleton";
 import {
@@ -22,8 +22,30 @@ import {
   getSupervisorId,
 } from "@/features/teachers/api/queries";
 import { AssignSupervisorModal } from "@/features/teachers/AssignSupervisorModal";
-import TeacherSchedule from "@/features/teachers/TeacherSchedule";
-import TeacherPerformance from "@/features/teachers/TeacherPerformance";
+
+const TeacherWorkloadAreaChart = dynamic(
+  () => import("@/features/teachers/TeacherWorkloadAreaChart"),
+  {
+    ssr: false,
+    loading: () => <div className="flex-1 min-h-[300px] animate-pulse rounded-lg bg-gray-100" />,
+  },
+);
+
+const TeacherSchedule = dynamic(
+  () => import("@/features/teachers/TeacherSchedule"),
+  {
+    ssr: false,
+    loading: () => <div className="h-[400px] w-full animate-pulse rounded-xl bg-white border border-gray-100" />,
+  },
+);
+
+const TeacherPerformance = dynamic(
+  () => import("@/features/teachers/TeacherPerformance"),
+  {
+    ssr: false,
+    loading: () => <div className="h-[200px] w-full animate-pulse rounded-xl bg-white border border-gray-100" />,
+  },
+);
 
 // ── Remaining mock data (will be replaced gradually) ──────────────────────────
 const teacherData = {

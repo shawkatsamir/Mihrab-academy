@@ -28,12 +28,25 @@ export function SessionHeader({ session }: Props) {
       {session.shifted_from_session_id && (
         <p className="flex items-center gap-1.5 text-sm text-purple-600">
           <ArrowRightLeft className="h-3.5 w-3.5" />
-          Shifted from{" "}
+          Rescheduled from{" "}
           <Link
             href={`/sessions/${session.shifted_from_session_id}`}
             className="underline underline-offset-2 hover:text-purple-800"
           >
             original session
+          </Link>
+        </p>
+      )}
+
+      {session.shifted_to_session_id && (
+        <p className="flex items-center gap-1.5 text-sm text-purple-600">
+          <ArrowRightLeft className="h-3.5 w-3.5" />
+          Rescheduled to{" "}
+          <Link
+            href={`/sessions/${session.shifted_to_session_id}`}
+            className="underline underline-offset-2 hover:text-purple-800"
+          >
+            new session
           </Link>
         </p>
       )}

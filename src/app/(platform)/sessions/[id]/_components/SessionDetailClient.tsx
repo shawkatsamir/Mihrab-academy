@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import dynamic from "next/dynamic";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { Button } from "@/shared/ui/Button";
@@ -8,12 +9,25 @@ import { SessionHeader } from "@/features/sessions/components/SessionHeader";
 import { ParticipantsBar } from "@/features/sessions/components/ParticipantsBar";
 import { ZoomJoinSection } from "@/features/sessions/components/ZoomJoinSection";
 import { SessionMetadataCard } from "@/features/sessions/components/SessionMetadataCard";
-import { TeacherReportSection } from "@/features/sessions/components/TeacherReportSection";
-import { ParentRatingSection } from "@/features/sessions/components/ParentRatingSection";
-import { SupervisorEvalSection } from "@/features/sessions/components/SupervisorEvalSection";
-import { AdminEvalOverview } from "@/features/sessions/components/AdminEvalOverview";
 import { MarkCompleteCard } from "@/features/sessions/components/MarkCompleteSection";
 import type { EnrichedSessionRow } from "@/features/sessions/api/queries";
+
+const TeacherReportSection = dynamic(
+  () => import("@/features/sessions/components/TeacherReportSection").then((m) => ({ default: m.TeacherReportSection })),
+  { ssr: false },
+);
+const ParentRatingSection = dynamic(
+  () => import("@/features/sessions/components/ParentRatingSection").then((m) => ({ default: m.ParentRatingSection })),
+  { ssr: false },
+);
+const SupervisorEvalSection = dynamic(
+  () => import("@/features/sessions/components/SupervisorEvalSection").then((m) => ({ default: m.SupervisorEvalSection })),
+  { ssr: false },
+);
+const AdminEvalOverview = dynamic(
+  () => import("@/features/sessions/components/AdminEvalOverview").then((m) => ({ default: m.AdminEvalOverview })),
+  { ssr: false },
+);
 
 interface Props {
   session: EnrichedSessionRow;
@@ -56,7 +70,9 @@ export function SessionDetailClient({
       {/* ── Shared info ──────────────────────────────────────── */}
       <SessionHeader session={session} />
       <ParticipantsBar session={session} />
-      <ZoomJoinSection session={session} />
+      {(session.status === "scheduled" || session.status === "live") && (
+        <ZoomJoinSection session={session} />
+      )}
       <SessionMetadataCard session={session} />
 
       {/*
