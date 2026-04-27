@@ -2,6 +2,7 @@
 
 import { ChevronRight } from "lucide-react";
 import { motion } from "motion/react";
+import { Img } from "./Image";
 
 const articles = [
   {
@@ -61,11 +62,12 @@ export default function BlogPreview() {
               className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-shadow duration-300 flex flex-col"
             >
               <div className="relative h-48 overflow-hidden">
-                <img
+                <Img
                   src={article.image}
                   alt={article.title}
                   className="w-full h-full object-cover transform hover:scale-105 transition-transform duration-500"
                   referrerPolicy="no-referrer"
+                  fill
                 />
                 <div className="absolute top-4 left-4 bg-mihrab-gold text-white text-xs font-bold px-3 py-1 rounded uppercase tracking-wider">
                   {article.category}

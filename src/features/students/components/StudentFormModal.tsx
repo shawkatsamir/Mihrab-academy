@@ -25,7 +25,12 @@ import { useState } from "react";
 interface Props {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  student?: any;
+  student?: {
+    id: string;
+    profiles?: { full_name?: string | null; is_active?: boolean | null } | { full_name?: string | null; is_active?: boolean | null }[];
+    date_of_birth?: string | null;
+    parent_whatsapp?: string | null;
+  } | null;
 }
 
 export function StudentFormModal({ open, onOpenChange, student }: Props) {
@@ -80,8 +85,8 @@ export function StudentFormModal({ open, onOpenChange, student }: Props) {
 
       form.reset();
       onOpenChange(false);
-    } catch (err: any) {
-      setError(err.message ?? "Failed to save");
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Failed to save");
     }
   };
 

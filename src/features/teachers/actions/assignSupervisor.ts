@@ -69,7 +69,7 @@ export async function assignSupervisor({
  * Only admins can perform this action.
  */
 export async function unassignSupervisor({ teacherId }: { teacherId: string }) {
-  const { user } = await requireRole(["admin"]);
+  await requireRole(["admin"]);
 
   const { error } = await supabaseAdmin
     .from("supervisor_assignments")

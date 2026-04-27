@@ -7,9 +7,19 @@ import { StarInput } from "@/features/sessions/components/StarInput";
 import { LOCKED_TOPIC } from "@/features/sessions/lib/topic-presets";
 
 interface Props {
-  teacherEval?: any;
-  supervisorEval?: any;
-  parentRating?: any;
+  teacherEval?: {
+    is_visible_to_parent?: boolean | null;
+    categories?: unknown;
+    notes_md?: string | null;
+  } | null;
+  supervisorEval?: {
+    rating?: number | null;
+    notes_md?: string | null;
+  } | null;
+  parentRating?: {
+    rating?: number | null;
+    comment?: string | null;
+  } | null;
 }
 
 export function AdminEvalOverview({
@@ -90,7 +100,7 @@ export function AdminEvalOverview({
             {supervisorEval ? (
               <div className="space-y-2">
                 <StarInput
-                  value={supervisorEval.rating}
+                  value={supervisorEval.rating ?? 0}
                   onChange={() => {}}
                   readOnly
                   size={16}
@@ -120,7 +130,7 @@ export function AdminEvalOverview({
               <div className="space-y-2 text-center">
                 <div className="flex justify-center">
                   <StarInput
-                    value={parentRating.rating}
+                    value={parentRating.rating ?? 0}
                     onChange={() => {}}
                     readOnly
                     size={18}

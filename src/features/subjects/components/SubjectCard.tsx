@@ -17,7 +17,7 @@ const CATEGORY_COLORS: Record<string, string> = {
   islamic_studies: "bg-amber-100 text-amber-800",
 };
 
-export function SubjectCard({ subject, isAdmin }: Props) {
+export function SubjectCard({ subject }: Props) {
   return (
     <Link href={`/subjects/${subject.id}`}>
       <Card className="h-full hover:shadow-md transition-shadow cursor-pointer">

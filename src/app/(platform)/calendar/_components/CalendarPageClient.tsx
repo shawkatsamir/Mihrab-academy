@@ -7,8 +7,7 @@ import { useSessions } from "@/features/sessions/api/queries";
 // FullCalendar imports 5 heavy plugins. Defer the entire shell client-side so
 // the calendar page shell compiles without them on first server render.
 const CalendarShell = dynamic(
-  () =>
-    import("./CalendarShell").then((m) => ({ default: m.CalendarShell })),
+  () => import("./CalendarShell").then((m) => ({ default: m.CalendarShell })),
   {
     ssr: false,
     loading: () => (
@@ -30,10 +29,6 @@ export function CalendarPageClient({ role }: Props) {
   const { data: sessions = [] } = useSessions(range);
 
   return (
-    <CalendarShell
-      sessions={sessions}
-      role={role}
-      onRangeChange={setRange}
-    />
+    <CalendarShell sessions={sessions} role={role} onRangeChange={setRange} />
   );
 }

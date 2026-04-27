@@ -33,9 +33,9 @@ interface Props {
   session: EnrichedSessionRow;
   role: "admin" | "supervisor" | "teacher" | "student";
   userId: string;
-  teacherEval: any;
-  supervisorEval: any;
-  parentRating: any;
+  teacherEval: { is_visible_to_parent?: boolean | null; categories?: unknown; notes_md?: string | null; } | null;
+  supervisorEval: { rating?: number | null; notes_md?: string | null; } | null;
+  parentRating: { rating?: number | null; comment?: string | null; submitted_at?: string | null; } | null;
 }
 
 export function SessionDetailClient({
@@ -100,21 +100,21 @@ export function SessionDetailClient({
           {/* Read-only once saved for the first time */}
           <TeacherReportSection
             session={session}
-            existingEval={localTeacherEval}
+            existingEval={localTeacherEval as { is_visible_to_parent?: boolean; categories?: { category: string; score: number }[]; notes_md?: string; } | undefined}
             readOnly={!!localTeacherEval}
             onSaved={setLocalTeacherEval}
           />
           {localSupervisorEval && (
             <SupervisorEvalSection
               session={session}
-              existingEval={localSupervisorEval}
+              existingEval={localSupervisorEval ?? undefined}
               readOnly
             />
           )}
           {localParentRating && (
             <ParentRatingSection
               session={session}
-              existingRating={localParentRating}
+              existingRating={localParentRating ?? undefined}
               readOnly
             />
           )}
@@ -131,7 +131,7 @@ export function SessionDetailClient({
             */
             <SupervisorEvalSection
               session={session}
-              existingEval={localSupervisorEval}
+              existingEval={localSupervisorEval ?? undefined}
               readOnly={!!localSupervisorEval}
               userId={userId}
               onSaved={setLocalSupervisorEval}
@@ -152,7 +152,7 @@ export function SessionDetailClient({
           {isCompleted && (
             <ParentRatingSection
               session={session}
-              existingRating={localParentRating}
+              existingRating={localParentRating ?? undefined}
               readOnly={!!localParentRating}
               onSaved={setLocalParentRating}
             />
@@ -160,7 +160,7 @@ export function SessionDetailClient({
           {localTeacherEval?.is_visible_to_parent && (
             <TeacherReportSection
               session={session}
-              existingEval={localTeacherEval}
+              existingEval={localTeacherEval as { is_visible_to_parent?: boolean; categories?: { category: string; score: number }[]; notes_md?: string; } | undefined}
               readOnly
             />
           )}

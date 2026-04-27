@@ -127,8 +127,6 @@ export default function SupervisorDetails({
             <TeachersTable
               teachers={assignedTeachers}
               isLoading={loadingTeachers}
-              isAdmin={false}
-              onEdit={() => {}}
             />
           </div>
 
@@ -201,7 +199,7 @@ export default function SupervisorDetails({
 
 // ── Shared helper ────────────────────────────────────────────────────────────
 
-function InfoRow({ icon, label, value, highlight = false }: any) {
+function InfoRow({ icon, label, value, highlight = false }: { icon: React.ReactNode, label: string, value: React.ReactNode, highlight?: boolean }) {
   return (
     <div className="flex items-start gap-4">
       <div

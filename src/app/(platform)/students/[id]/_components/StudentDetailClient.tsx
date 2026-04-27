@@ -103,11 +103,11 @@ export function StudentDetailClient({ student }: Props) {
   const name = profiles?.full_name ?? "Unknown";
 
   const currentSubjectIds = (student.student_subjects ?? []).map(
-    (ss: any) => ss.subject_id as string,
+    (ss: { subject_id?: unknown }) => ss.subject_id as string,
   );
 
   const enrolledCourses = (student.student_subjects ?? []).map(
-    (ss: any, i: number) => {
+    (ss: { subjects?: { name?: string } | { name?: string }[] }, i: number) => {
       const subj = Array.isArray(ss.subjects) ? ss.subjects[0] : ss.subjects;
       return { id: i + 1, subject: subj?.name ?? "—", progress: 0 };
     },
