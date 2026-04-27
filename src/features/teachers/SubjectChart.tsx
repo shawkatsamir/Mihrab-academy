@@ -13,7 +13,7 @@ export default function SubjectChart() {
   return (
     <div className="flex flex-col h-full w-full">
       <div className="relative h-[200px] w-full flex-shrink-0">
-        <ResponsiveContainer width="100%" height="100%">
+        <ResponsiveContainer width="100%" height="100%" minWidth={0}>
           <PieChart>
             <Pie
               data={data}

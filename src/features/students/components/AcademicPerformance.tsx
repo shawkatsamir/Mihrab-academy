@@ -46,7 +46,7 @@ export function AcademicPerformance({
         {/* Left Side: Gauge & Description */}
         <div className="flex-1 flex flex-col items-center max-w-[280px] w-full mx-auto">
           <div className="h-[120px] w-full relative mb-4">
-            <ResponsiveContainer width="100%" height="100%">
+            <ResponsiveContainer width="100%" height="100%" minWidth={0}>
               <PieChart>
                 <Pie
                   data={gaugeData}
@@ -87,7 +87,7 @@ export function AcademicPerformance({
 
         {/* Right Side: Bar Chart */}
         <div className="flex-1 w-full h-[200px]">
-          <ResponsiveContainer width="100%" height="100%">
+          <ResponsiveContainer width="100%" height="100%" minWidth={0}>
             <BarChart data={monthlyData} barSize={24}>
               <XAxis
                 dataKey="month"

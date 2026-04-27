@@ -15,12 +15,32 @@ import { useSessions } from "@/features/sessions/api/queries";
 import { Button } from "@/shared/ui/Button";
 import { Calendar } from "@/shared/ui/Calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/shared/ui/Popover";
-import { AdminSessionsView } from "./AdminSessionsView";
-import { SupervisorSessionsView } from "./SupervisorSessionsView";
-import { TeacherSessionsView } from "./TeacherSessionsView";
-import { StudentSessionsView } from "./StudentSessionsView";
-import { ScheduleSessionModal } from "@/features/sessions/components/ScheduleSessionModal";
+import dynamic from "next/dynamic";
 import { SessionStatsCards } from "@/features/sessions/components/SessionStatsCards";
+
+const AdminSessionsView = dynamic(
+  () => import("./AdminSessionsView").then((m) => ({ default: m.AdminSessionsView })),
+  { ssr: false, loading: () => <div className="h-80 bg-muted animate-pulse rounded-lg" /> },
+);
+const SupervisorSessionsView = dynamic(
+  () => import("./SupervisorSessionsView").then((m) => ({ default: m.SupervisorSessionsView })),
+  { ssr: false, loading: () => <div className="h-80 bg-muted animate-pulse rounded-lg" /> },
+);
+const TeacherSessionsView = dynamic(
+  () => import("./TeacherSessionsView").then((m) => ({ default: m.TeacherSessionsView })),
+  { ssr: false, loading: () => <div className="h-80 bg-muted animate-pulse rounded-lg" /> },
+);
+const StudentSessionsView = dynamic(
+  () => import("./StudentSessionsView").then((m) => ({ default: m.StudentSessionsView })),
+  { ssr: false, loading: () => <div className="h-80 bg-muted animate-pulse rounded-lg" /> },
+);
+const ScheduleSessionModal = dynamic(
+  () =>
+    import("@/features/sessions/components/ScheduleSessionModal").then(
+      (m) => ({ default: m.ScheduleSessionModal }),
+    ),
+  { ssr: false },
+);
 
 type DateMode = "day" | "week" | "month";
 

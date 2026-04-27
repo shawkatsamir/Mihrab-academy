@@ -2,8 +2,9 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/shared/ui/Card";
 import { Badge } from "@/shared/ui/Badge";
-import { Eye, EyeOff, GraduationCap, ClipboardCheck, Star } from "lucide-react";
+import { Eye, EyeOff, GraduationCap, ClipboardCheck, Star, Lock } from "lucide-react";
 import { StarInput } from "@/features/sessions/components/StarInput";
+import { LOCKED_TOPIC } from "@/features/sessions/lib/topic-presets";
 
 interface Props {
   teacherEval?: any;
@@ -46,11 +47,16 @@ export function AdminEvalOverview({
             {teacherEval ? (
               <div className="space-y-2">
                 <div className="flex flex-wrap gap-3">
-                  {(teacherEval.categories as any[])?.map((c: any) => (
+                  {(teacherEval.categories as { category: string; score: number }[])?.map((c) => (
                     <div key={c.category}>
-                      <p className="text-xs text-muted-foreground">
-                        {c.category}
-                      </p>
+                      <div className="flex items-center gap-0.5">
+                        {c.category === LOCKED_TOPIC && (
+                          <Lock className="h-2.5 w-2.5 text-muted-foreground" />
+                        )}
+                        <p className="text-xs text-muted-foreground">
+                          {c.category}
+                        </p>
+                      </div>
                       <StarInput
                         value={c.score}
                         onChange={() => {}}

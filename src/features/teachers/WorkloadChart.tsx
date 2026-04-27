@@ -19,7 +19,7 @@ const data = [
 
 export default function WorkloadChart() {
   return (
-    <ResponsiveContainer width="100%" height="100%" minHeight={250}>
+    <ResponsiveContainer width="100%" height="100%" minHeight={250} minWidth={0}>
       <BarChart
         data={data}
         margin={{ top: 10, right: 10, left: -20, bottom: 0 }}

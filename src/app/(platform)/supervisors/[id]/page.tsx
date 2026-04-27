@@ -1,15 +1,24 @@
 "use client";
 
 import { use } from "react";
+import dynamic from "next/dynamic";
 import Link from "next/link";
 import { format } from "date-fns";
 import { ArrowLeft, Mail, ShieldAlert } from "lucide-react";
 import { Img } from "@/shared/ui/Image";
 import { Skeleton } from "@/shared/ui/Skeleton";
 import { TeachersTable } from "@/features/teachers/TeachersTable";
-import { CalendarView, CalendarEvent } from "@/shared/ui/CalendarView";
+import type { CalendarEvent } from "@/shared/ui/CalendarView";
 import { useSupervisor } from "@/features/supervisors/api/queries";
 import { useTeachersBySupervisor } from "@/features/teachers/api/queries";
+
+const CalendarView = dynamic(
+  () => import("@/shared/ui/CalendarView").then((m) => ({ default: m.CalendarView })),
+  {
+    ssr: false,
+    loading: () => <div className="h-[400px] w-full animate-pulse rounded-xl bg-white border border-gray-100" />,
+  },
+);
 
 // ── Mock calendar events (will be replaced gradually) ───────────────────────
 

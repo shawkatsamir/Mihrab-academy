@@ -4,6 +4,7 @@ import { useMemo } from "react";
 import { isToday, isThisWeek } from "date-fns";
 import { Activity, CheckCircle2, Clock, XCircle } from "lucide-react";
 import { Card, CardContent } from "@/shared/ui/Card";
+import { getEffectiveStatus } from "@/features/sessions/lib/time-gate";
 import type { SessionDetailRow } from "@/features/sessions/api/queries";
 
 export function SessionStatsCards({
@@ -13,7 +14,7 @@ export function SessionStatsCards({
 }) {
   const stats = useMemo(
     () => ({
-      liveNow: sessions.filter((s) => s.status === "live").length,
+      liveNow: sessions.filter((s) => getEffectiveStatus(s) === "live").length,
       completedThisWeek: sessions.filter(
         (s) =>
           s.status === "completed" &&
@@ -22,7 +23,7 @@ export function SessionStatsCards({
       ).length,
       upcomingToday: sessions.filter(
         (s) =>
-          s.status === "scheduled" &&
+          getEffectiveStatus(s) === "scheduled" &&
           s.scheduled_at &&
           isToday(new Date(s.scheduled_at)),
       ).length,

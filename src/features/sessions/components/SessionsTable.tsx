@@ -15,6 +15,7 @@ import { Button } from "@/shared/ui/Button";
 import { Input } from "@/shared/ui/Input";
 import { Eye, ArrowRightLeft, X, Search } from "lucide-react";
 import { SessionStatusBadge } from "./SessionStatusBadge";
+import { getEffectiveStatus } from "@/features/sessions/lib/time-gate";
 import type { SessionDetailRow } from "@/features/sessions/api/queries";
 
 type StatusFilter =
@@ -161,7 +162,11 @@ export function SessionsTable({
                   )}
                 </TableCell>
                 <TableCell>
-                  <SessionStatusBadge status={s.status} />
+                  <SessionStatusBadge
+                    status={
+                      getEffectiveStatus(s) as SessionDetailRow["status"]
+                    }
+                  />
                 </TableCell>
                 <TableCell onClick={(e) => e.stopPropagation()}>
                   <Button size="icon" variant="ghost" asChild>
@@ -173,7 +178,8 @@ export function SessionsTable({
                 {showActions && (
                   <TableCell onClick={(e) => e.stopPropagation()}>
                     <div className="flex items-center gap-1">
-                      {s.status === "scheduled" && (
+                      {s.status === "scheduled" &&
+                        getEffectiveStatus(s) !== "live" && (
                         <>
                           <Button
                             size="icon"

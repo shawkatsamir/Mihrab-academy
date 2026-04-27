@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import dynamic from "next/dynamic";
 import {
   useTeachers,
   useTeachersBySupervisor,
@@ -8,7 +9,15 @@ import {
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { TeachersTable } from "@/features/teachers/TeachersTable";
-import { TeacherFormModal } from "@/features/teachers/AddTeacher";
+
+// Modal uses react-hook-form + zod — defer until the user opens it.
+const TeacherFormModal = dynamic(
+  () =>
+    import("@/features/teachers/AddTeacher").then((m) => ({
+      default: m.TeacherFormModal,
+    })),
+  { ssr: false },
+);
 
 interface Props {
   role: "admin" | "supervisor" | "teacher" | "student";
