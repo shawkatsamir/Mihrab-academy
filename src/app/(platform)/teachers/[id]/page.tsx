@@ -162,7 +162,7 @@ export default function TeacherDetails({
             </div>
           </div>
 
-          <TeacherSchedule />
+          <TeacherSchedule teacherId={id} />
         </div>
 
         {/* ── Sidebar ──────────────────────────────────────────────────────── */}
@@ -301,7 +301,7 @@ export default function TeacherDetails({
 
 // ── Helper ────────────────────────────────────────────────────────────────────
 
-function InfoRow({ icon, label, value, highlight = false }: any) {
+function InfoRow({ icon, label, value, highlight = false }: { icon: React.ReactNode, label: string, value: React.ReactNode, highlight?: boolean }) {
   return (
     <div className="flex items-start gap-4">
       <div

@@ -3,7 +3,7 @@ import { z } from "zod";
 export const teacherFormSchema = z.object({
   full_name: z.string().min(2, "Name must be at least 2 characters"),
   email: z.email("Invalid email address"),
-  price_per_session: z.coerce
+  price_per_session: z
     .number()
     .min(0, "Price cannot be negative")
     .int("Price must be a whole number (cents)"),

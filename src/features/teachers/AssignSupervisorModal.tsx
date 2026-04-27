@@ -58,8 +58,8 @@ export function AssignSupervisorModal({
         await assignMutation.mutateAsync({ teacherId, supervisorId: selectedId });
       }
       onOpenChange(false);
-    } catch (err: any) {
-      setError(err.message ?? "Something went wrong");
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Something went wrong");
     }
   };
 

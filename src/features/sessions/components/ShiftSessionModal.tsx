@@ -55,8 +55,8 @@ export function ShiftSessionModal({ open, onOpenChange, session }: Props) {
         reason: reason || undefined,
       });
       onOpenChange(false);
-    } catch (err: any) {
-      setError(err.message ?? "Shift failed");
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Shift failed");
     }
   };
 

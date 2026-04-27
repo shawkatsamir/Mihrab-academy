@@ -32,8 +32,8 @@ const schema = z.object({
   category: z.enum(["quran", "arabic", "islamic_studies"]),
   description: z.string().optional(),
   overview_md: z.string().optional(),
-  estimated_sessions: z.coerce.number().min(1).optional(),
-  sort_order: z.coerce.number().default(0),
+  estimated_sessions: z.number().min(1).optional(),
+  sort_order: z.number(),
 });
 
 type FormValues = z.infer<typeof schema>;
@@ -86,8 +86,8 @@ export function SubjectFormModal({ open, onOpenChange, subject }: Props) {
       }
       form.reset();
       onOpenChange(false);
-    } catch (err: any) {
-      setError(err.message ?? "Failed to save");
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Failed to save");
     }
   };
 
@@ -153,7 +153,7 @@ export function SubjectFormModal({ open, onOpenChange, subject }: Props) {
               <Input
                 id="estimated_sessions"
                 type="number"
-                {...form.register("estimated_sessions")}
+                {...form.register("estimated_sessions", { valueAsNumber: true })}
               />
             </div>
             <div className="space-y-2">
@@ -161,7 +161,7 @@ export function SubjectFormModal({ open, onOpenChange, subject }: Props) {
               <Input
                 id="sort_order"
                 type="number"
-                {...form.register("sort_order")}
+                {...form.register("sort_order", { valueAsNumber: true })}
               />
             </div>
           </div>

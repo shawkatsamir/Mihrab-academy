@@ -22,12 +22,7 @@ interface Props {
   onEdit: (supervisor: SupervisorWithProfile) => void;
 }
 
-export function SupervisorsTable({
-  supervisors,
-  isLoading,
-  isAdmin,
-  onEdit,
-}: Props) {
+export function SupervisorsTable({ supervisors, isLoading }: Props) {
   const router = useRouter();
 
   if (isLoading) {

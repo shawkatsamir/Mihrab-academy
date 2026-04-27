@@ -92,8 +92,8 @@ export function TeacherFormModal({ open, onOpenChange, teacher }: Props) {
       setPreview(null);
       setImageFile(null);
       onOpenChange(false);
-    } catch (err: any) {
-      setError(err.message ?? "Something went wrong");
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Something went wrong");
     } finally {
       setPending(false);
     }
@@ -168,9 +168,9 @@ export function TeacherFormModal({ open, onOpenChange, teacher }: Props) {
                 {...form.register("email")}
                 placeholder="teacher@example.com"
               />
-              {form.formState.errors.email && (
+              {(form.formState.errors as Record<string, { message?: string }>).email && (
                 <p className="text-xs text-red-500">
-                  {form.formState.errors.email.message}
+                  {(form.formState.errors as Record<string, { message?: string }>).email?.message}
                 </p>
               )}
             </div>

@@ -1,6 +1,7 @@
 "use client";
 import { CheckCircle2, Users } from "lucide-react";
 import { motion } from "motion/react";
+import { Img } from "./Image";
 
 const benefits = [
   {
@@ -74,11 +75,13 @@ export default function WhyChooseUs() {
           className="relative mt-12 md:mt-0"
         >
           <div className="rounded-2xl overflow-hidden shadow-2xl">
-            <img
+            <Img
               src="https://lh3.googleusercontent.com/aida-public/AB6AXuAzLfRlxWuuRECMsGfc2-qsMwrPwy4MLpA7wQdGDr5B0bkCIEfxojc4l-qDpXhaY1PSZZtA3SPtdaJWrTK-ZrvCpVKZ_y3TVkmuf9urlO04Z4DltLoMead5sGCoH6VD-6s-z761yKqEwWbzh1dtx5uA6Z_Owt4qLfQtSnTTKH7GlbR2A-MHmFTROmPPMKsBgBmNYKgWPfELzca-ErgVKTOgnxEjOC0VgfHPDnGvhBu2EjglZKP4ymA2KsDCh63Vt-2VpzCd9zx0TVPc"
               alt="Student reading Quran in courtyard"
               className="w-full h-[500px] object-cover"
               referrerPolicy="no-referrer"
+              width={400}
+              height={400}
             />
           </div>
 
