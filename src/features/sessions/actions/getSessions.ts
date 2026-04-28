@@ -98,6 +98,102 @@ export async function getSessions(range?: { start: string; end: string }) {
   return data ?? [];
 }
 
+const PAGE_SIZE = 15;
+
+export async function getPagedSessions(
+  range?: { start: string; end: string },
+  page: number = 1,
+): Promise<{ data: Awaited<ReturnType<typeof getSessions>>; count: number }> {
+  const { user, role } = await requireRole([
+    "admin",
+    "supervisor",
+    "teacher",
+    "student",
+  ]);
+
+  const start =
+    range?.start ??
+    (() => {
+      const d = new Date();
+      d.setDate(d.getDate() - 7);
+      return d.toISOString();
+    })();
+  const end =
+    range?.end ??
+    (() => {
+      const d = new Date();
+      d.setDate(d.getDate() + 30);
+      return d.toISOString();
+    })();
+
+  const from = (page - 1) * PAGE_SIZE;
+  const to = from + PAGE_SIZE - 1;
+
+  if (role === "student") {
+    const { data, error, count } = await supabaseAdmin
+      .from("v_session_details")
+      .select("*", { count: "exact" })
+      .eq("student_id", user.id)
+      .gte("scheduled_at", start)
+      .lte("scheduled_at", end)
+      .order("scheduled_at", { ascending: true })
+      .range(from, to);
+
+    if (error) throw new Error(error.message);
+    return { data: data ?? [], count: count ?? 0 };
+  }
+
+  if (role === "teacher") {
+    const { data, error, count } = await supabaseAdmin
+      .from("v_session_details")
+      .select("*", { count: "exact" })
+      .eq("teacher_id", user.id)
+      .gte("scheduled_at", start)
+      .lte("scheduled_at", end)
+      .order("scheduled_at", { ascending: true })
+      .range(from, to);
+
+    if (error) throw new Error(error.message);
+    return { data: data ?? [], count: count ?? 0 };
+  }
+
+  if (role === "supervisor") {
+    const { data: assignments, error: assignErr } = await supabaseAdmin
+      .from("supervisor_assignments")
+      .select("teacher_id")
+      .eq("supervisor_id", user.id);
+
+    if (assignErr) throw new Error(assignErr.message);
+
+    const teacherIds = (assignments ?? []).map((a) => a.teacher_id);
+    if (teacherIds.length === 0) return { data: [], count: 0 };
+
+    const { data, error, count } = await supabaseAdmin
+      .from("v_session_details")
+      .select("*", { count: "exact" })
+      .in("teacher_id", teacherIds)
+      .gte("scheduled_at", start)
+      .lte("scheduled_at", end)
+      .order("scheduled_at", { ascending: true })
+      .range(from, to);
+
+    if (error) throw new Error(error.message);
+    return { data: data ?? [], count: count ?? 0 };
+  }
+
+  // admin — full access
+  const { data, error, count } = await supabaseAdmin
+    .from("v_session_details")
+    .select("*", { count: "exact" })
+    .gte("scheduled_at", start)
+    .lte("scheduled_at", end)
+    .order("scheduled_at", { ascending: true })
+    .range(from, to);
+
+  if (error) throw new Error(error.message);
+  return { data: data ?? [], count: count ?? 0 };
+}
+
 export async function getSessionById(id: string) {
   const { user, role } = await requireRole([
     "admin",
