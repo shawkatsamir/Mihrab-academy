@@ -61,6 +61,16 @@ export function useTeacher(id: string) {
   });
 }
 
+import { getTeacherStats } from "../actions/getTeacherStats";
+
+export function useTeacherStats(teacherId: string) {
+  return useQuery({
+    queryKey: teacherKeys.stats(teacherId),
+    queryFn: () => getTeacherStats(teacherId),
+    enabled: !!teacherId,
+  });
+}
+
 import { getTeachersBySupervisor } from "../actions/getTeachers";
 
 /**
