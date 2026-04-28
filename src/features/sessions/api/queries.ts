@@ -6,6 +6,7 @@ import type { Tables } from "@/lib/supabase/database.types";
 import {
   getSessions,
   getSessionById,
+  getPagedSessions,
 } from "@/features/sessions/actions/getSessions";
 import { getAvailableTeachers } from "@/features/sessions/actions/getAvailableTeachers";
 import {
@@ -30,6 +31,16 @@ export function useSessions(range?: { start: string; end: string }) {
   return useQuery({
     queryKey: sessionKeys.list(range),
     queryFn: () => getSessions(range) as Promise<SessionDetailRow[]>,
+  });
+}
+
+export function usePagedSessions(
+  range?: { start: string; end: string },
+  page: number = 1,
+) {
+  return useQuery({
+    queryKey: sessionKeys.pagedList(range, page),
+    queryFn: () => getPagedSessions(range, page),
   });
 }
 

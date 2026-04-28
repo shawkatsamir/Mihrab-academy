@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import {
   format,
   startOfDay,
@@ -11,7 +11,8 @@ import {
   endOfMonth,
 } from "date-fns";
 import { Plus, CalendarIcon } from "lucide-react";
-import { useSessions } from "@/features/sessions/api/queries";
+import { usePagedSessions } from "@/features/sessions/api/queries";
+import { Pagination } from "@/shared/ui/Pagination";
 import { Button } from "@/shared/ui/Button";
 import { Calendar } from "@/shared/ui/Calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/shared/ui/Popover";
@@ -52,6 +53,7 @@ export function SessionsPageClient({ role }: Props) {
   const [scheduleOpen, setScheduleOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [dateMode, setDateMode] = useState<DateMode>("week");
+  const [page, setPage] = useState(1);
 
   const range = useMemo(() => {
     if (dateMode === "day") {
@@ -82,7 +84,12 @@ export function SessionsPageClient({ role }: Props) {
     return format(selectedDate, "MMMM yyyy");
   }, [selectedDate, dateMode]);
 
-  const { data: sessions = [], isLoading } = useSessions(range);
+  // Reset to page 1 whenever the date range changes
+  useEffect(() => { setPage(1); }, [range]);
+
+  const { data: result, isLoading } = usePagedSessions(range, page);
+  const sessions = result?.data ?? [];
+  const totalPages = Math.ceil((result?.count ?? 0) / 15);
   const canCreate = role === "admin" || role === "supervisor";
 
   if (isLoading) {
@@ -159,6 +166,8 @@ export function SessionsPageClient({ role }: Props) {
       {role === "supervisor" && <SupervisorSessionsView sessions={sessions} />}
       {role === "teacher" && <TeacherSessionsView sessions={sessions} />}
       {role === "student" && <StudentSessionsView sessions={sessions} />}
+
+      <Pagination page={page} totalPages={totalPages} onPageChange={setPage} />
 
       {canCreate && (
         <ScheduleSessionModal
