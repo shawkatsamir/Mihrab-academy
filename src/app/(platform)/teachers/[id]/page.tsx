@@ -92,8 +92,8 @@ export default function TeacherDetails({
   const joinDate = teacher.profiles?.created_at
     ? format(new Date(teacher.profiles.created_at), "MMM d, yyyy")
     : "Unknown";
-  const price = teacher.price_per_session
-    ? `$${teacher.price_per_session.toFixed(2)}`
+  const price = teacher.price_per_hour
+    ? `$${teacher.price_per_hour.toFixed(2)}`
     : "Not Set";
   const supervisorName = getSupervisorName(teacher);
   const supervisorId = getSupervisorId(teacher);

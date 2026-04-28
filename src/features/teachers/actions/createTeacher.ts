@@ -22,12 +22,13 @@ export async function createTeacher(formData: FormData) {
 
   const fullName = formData.get("full_name") as string;
   const email = formData.get("email") as string;
-  const priceRaw = formData.get("price_per_session") as string;
+  const priceRaw = formData.get("price_per_hour") as string;
   const bio = (formData.get("bio") as string) || null;
+  const zoomPersonalLink = (formData.get("zoom_personal_link") as string) || null;
   const imageFile = formData.get("image") as File | null;
 
-  const pricePerSession = parseInt(priceRaw, 10);
-  if (!fullName || !email || isNaN(pricePerSession) || pricePerSession < 0) {
+  const pricePerHour = parseInt(priceRaw, 10);
+  if (!fullName || !email || isNaN(pricePerHour) || pricePerHour < 0) {
     throw new Error("Invalid form data");
   }
 
@@ -79,7 +80,8 @@ export async function createTeacher(formData: FormData) {
   const { error: teacherErr } = await supabaseAdmin.from("teachers").insert({
     id: authData.user.id,
     bio,
-    price_per_session: pricePerSession,
+    price_per_hour: pricePerHour,
+    zoom_personal_link: zoomPersonalLink,
   });
 
   if (teacherErr) throw new Error(teacherErr.message);

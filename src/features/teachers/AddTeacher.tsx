@@ -49,8 +49,9 @@ export function TeacherFormModal({ open, onOpenChange, teacher }: Props) {
     defaultValues: {
       full_name: teacher?.profiles?.full_name ?? "",
       email: "", // never pre-fill email for edit
-      price_per_session: teacher?.price_per_session ?? 0,
+      price_per_hour: teacher?.price_per_hour ?? 0,
       bio: teacher?.bio ?? "",
+      zoom_personal_link: teacher?.zoom_personal_link ?? "",
     },
   });
 
@@ -73,7 +74,8 @@ export function TeacherFormModal({ open, onOpenChange, teacher }: Props) {
           values: {
             full_name: values.full_name,
             bio: (values as TeacherEditValues).bio,
-            price_per_session: values.price_per_session,
+            price_per_hour: values.price_per_hour,
+            zoom_personal_link: values.zoom_personal_link,
           },
           imageFile: imageFile ?? undefined,
         });
@@ -81,8 +83,10 @@ export function TeacherFormModal({ open, onOpenChange, teacher }: Props) {
         const formData = new FormData();
         formData.append("full_name", values.full_name);
         formData.append("email", (values as TeacherFormValues).email);
-        formData.append("price_per_session", String(values.price_per_session));
+        formData.append("price_per_hour", String(values.price_per_hour));
         if (values.bio) formData.append("bio", values.bio);
+        if (values.zoom_personal_link)
+          formData.append("zoom_personal_link", values.zoom_personal_link);
         if (imageFile) formData.append("image", imageFile);
 
         await createTeacher(formData);
@@ -168,9 +172,17 @@ export function TeacherFormModal({ open, onOpenChange, teacher }: Props) {
                 {...form.register("email")}
                 placeholder="teacher@example.com"
               />
-              {(form.formState.errors as Record<string, { message?: string }>).email && (
+              {(form.formState.errors as Record<string, { message?: string }>)
+                .email && (
                 <p className="text-xs text-red-500">
-                  {(form.formState.errors as Record<string, { message?: string }>).email?.message}
+                  {
+                    (
+                      form.formState.errors as Record<
+                        string,
+                        { message?: string }
+                      >
+                    ).email?.message
+                  }
                 </p>
               )}
             </div>
@@ -178,19 +190,44 @@ export function TeacherFormModal({ open, onOpenChange, teacher }: Props) {
 
           {/* Price */}
           <div className="space-y-2">
-            <Label htmlFor="price_per_session">Price / Session (cents)</Label>
+            <Label htmlFor="price_per_hour">Price / Hour (cents)</Label>
             <Input
-              id="price_per_session"
+              id="price_per_hour"
               type="number"
-              {...form.register("price_per_session")}
+              min={0}
+              {...form.register("price_per_hour", { valueAsNumber: true, min: { value: 0, message: "Price cannot be negative" } })}
               placeholder="2500"
             />
             <p className="text-xs text-muted-foreground">
               Enter amount in cents (e.g. 2500 = $25.00)
             </p>
-            {form.formState.errors.price_per_session && (
+            {form.formState.errors.price_per_hour && (
               <p className="text-xs text-red-500">
-                {form.formState.errors.price_per_session.message}
+                {form.formState.errors.price_per_hour.message}
+              </p>
+            )}
+          </div>
+
+          {/* Zoom URL */}
+          <div className="space-y-2">
+            <Label htmlFor="zoom_personal_link">Zoom Personal Link</Label>
+            <Input
+              id="zoom_personal_link"
+              type="url"
+              {...form.register("zoom_personal_link")}
+              placeholder="https://zoom.us/j/..."
+            />
+            {(form.formState.errors as Record<string, { message?: string }>)
+              .zoom_personal_link && (
+              <p className="text-xs text-red-500">
+                {
+                  (
+                    form.formState.errors as Record<
+                      string,
+                      { message?: string }
+                    >
+                  ).zoom_personal_link?.message
+                }
               </p>
             )}
           </div>
