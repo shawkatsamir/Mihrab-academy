@@ -25,7 +25,7 @@ export async function markSessionComplete(formData: FormData) {
   // Query sessions directly for a typed join — avoids casting (session as any)
   const { data: session, error: sErr } = await supabaseAdmin
     .from("sessions")
-    .select("teacher_id, student_id, status, teachers(price_per_session)")
+    .select("teacher_id, student_id, status, teachers(price_per_hour)")
     .eq("id", sessionId)
     .single();
 
@@ -70,8 +70,8 @@ export async function markSessionComplete(formData: FormData) {
 
   if (attErr) throw new Error(attErr.message);
 
-  // price_per_session is stored in dollars; amount_cents requires cents
-  const priceInDollars = session.teachers?.price_per_session ?? 0;
+  // price_per_hour is stored in dollars; amount_cents requires cents
+  const priceInDollars = session.teachers?.price_per_hour ?? 0;
   const amountCents = Math.round(priceInDollars * 100);
 
   if (amountCents > 0) {

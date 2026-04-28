@@ -44,7 +44,7 @@ export function TeachersTable({ teachers, isLoading }: Props) {
             <TableHead>Teacher</TableHead>
             <TableHead>Supervisor</TableHead>
             <TableHead>Status</TableHead>
-            <TableHead>Price / Session</TableHead>
+            <TableHead>Price / Hour</TableHead>
             <TableHead>Joined</TableHead>
           </TableRow>
         </TableHeader>
@@ -131,9 +131,7 @@ export function TeachersTable({ teachers, isLoading }: Props) {
 
                 {/* Price */}
                 <TableCell>
-                  {t.price_per_session
-                    ? `$${t.price_per_session.toFixed(2)}`
-                    : "—"}
+                  {t.price_per_hour ? `$${t.price_per_hour.toFixed(2)}` : "—"}
                 </TableCell>
 
                 {/* Joined */}

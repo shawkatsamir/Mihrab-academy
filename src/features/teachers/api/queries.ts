@@ -136,7 +136,8 @@ export function useUpdateTeacher() {
       values: {
         full_name: string;
         bio?: string;
-        price_per_session: number;
+        price_per_hour: number;
+        zoom_personal_link?: string;
       };
       imageFile?: File;
     }) => {
@@ -172,7 +173,8 @@ export function useUpdateTeacher() {
         .from("teachers")
         .update({
           bio: values.bio ?? null,
-          price_per_session: values.price_per_session,
+          price_per_hour: values.price_per_hour,
+          zoom_personal_link: values.zoom_personal_link ?? null,
         })
         .eq("id", id);
       if (tErr) throw tErr;

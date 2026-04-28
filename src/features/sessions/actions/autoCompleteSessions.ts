@@ -17,7 +17,7 @@ export async function autoCompleteStaleSessions() {
   const { data: staleSessions, error } = await supabaseAdmin
     .from("sessions")
     .select(
-      "id, teacher_id, student_id, duration_minutes, scheduled_at, teachers(price_per_session)",
+      "id, teacher_id, student_id, duration_minutes, scheduled_at, teachers(price_per_hour)",
     )
     .eq("status", "scheduled")
     .lt("scheduled_at", cutoff.toISOString());
@@ -63,7 +63,7 @@ export async function autoCompleteStaleSessions() {
       );
 
     // Accrue salary — same logic as manual completion
-    const priceInDollars = s.teachers?.price_per_session ?? 0;
+    const priceInDollars = s.teachers?.price_per_hour ?? 0;
     const amountCents = Math.round(priceInDollars * 100);
 
     if (amountCents > 0) {
