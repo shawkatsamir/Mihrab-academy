@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -103,13 +103,24 @@ export function ScheduleSessionModal({ open, onOpenChange }: Props) {
   const watchStudent = form.watch("student_id");
   const watchType = form.watch("session_type");
 
+  // Debounce time input to avoid firing availability queries on every keystroke
+  const [debouncedTime, setDebouncedTime] = useState<string | undefined>(
+    watchTime,
+  );
+  useEffect(() => {
+    const id = setTimeout(() => setDebouncedTime(watchTime), 500);
+    return () => clearTimeout(id);
+  }, [watchTime]);
+
   const proposedStart = useMemo(() => {
-    if (!watchDate || !watchTime) return null;
-    const [hours, minutes] = watchTime.split(":").map(Number);
+    if (!watchDate || !debouncedTime) return null;
+    const [hours, minutes] = debouncedTime.split(":").map(Number);
+    // Guard against partially-typed time (e.g. "12" → minutes=NaN → Invalid Date)
+    if (isNaN(hours) || isNaN(minutes)) return null;
     const d = new Date(watchDate);
     d.setHours(hours, minutes, 0, 0);
-    return d;
-  }, [watchDate, watchTime]);
+    return isNaN(d.getTime()) ? null : d;
+  }, [watchDate, debouncedTime]);
 
   const proposedEnd = useMemo(() => {
     if (!proposedStart) return null;
