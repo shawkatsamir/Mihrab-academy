@@ -18,6 +18,7 @@ import { Img } from "@/shared/ui/Image";
 import { Skeleton } from "@/shared/ui/Skeleton";
 import {
   useTeacher,
+  useTeacherStats,
   getSupervisorName,
   getSupervisorId,
 } from "@/features/teachers/api/queries";
@@ -27,7 +28,9 @@ const TeacherWorkloadAreaChart = dynamic(
   () => import("@/features/teachers/TeacherWorkloadAreaChart"),
   {
     ssr: false,
-    loading: () => <div className="flex-1 min-h-[300px] animate-pulse rounded-lg bg-gray-100" />,
+    loading: () => (
+      <div className="flex-1 min-h-[300px] animate-pulse rounded-lg bg-gray-100" />
+    ),
   },
 );
 
@@ -35,7 +38,9 @@ const TeacherSchedule = dynamic(
   () => import("@/features/teachers/TeacherSchedule"),
   {
     ssr: false,
-    loading: () => <div className="h-[400px] w-full animate-pulse rounded-xl bg-white border border-gray-100" />,
+    loading: () => (
+      <div className="h-[400px] w-full animate-pulse rounded-xl bg-white border border-gray-100" />
+    ),
   },
 );
 
@@ -43,7 +48,9 @@ const TeacherPerformance = dynamic(
   () => import("@/features/teachers/TeacherPerformance"),
   {
     ssr: false,
-    loading: () => <div className="h-[200px] w-full animate-pulse rounded-xl bg-white border border-gray-100" />,
+    loading: () => (
+      <div className="h-[200px] w-full animate-pulse rounded-xl bg-white border border-gray-100" />
+    ),
   },
 );
 
@@ -70,6 +77,7 @@ export default function TeacherDetails({
   const [assignModalOpen, setAssignModalOpen] = useState(false);
 
   const { data: teacher, isLoading } = useTeacher(id);
+  const { data: stats } = useTeacherStats(id);
 
   if (isLoading) {
     return (
@@ -92,9 +100,7 @@ export default function TeacherDetails({
   const joinDate = teacher.profiles?.created_at
     ? format(new Date(teacher.profiles.created_at), "MMM d, yyyy")
     : "Unknown";
-  const price = teacher.price_per_hour
-    ? `$${teacher.price_per_hour.toFixed(2)}`
-    : "Not Set";
+  const price = teacher.price_per_hour;
   const supervisorName = getSupervisorName(teacher);
   const supervisorId = getSupervisorId(teacher);
 
@@ -121,7 +127,9 @@ export default function TeacherDetails({
             className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm font-medium text-[#1A2B4C] hover:bg-gray-50 transition-colors"
           >
             <UserCheck className="w-4 h-4" />
-            {supervisorName ? `Supervisor: ${supervisorName}` : "Assign Supervisor"}
+            {supervisorName
+              ? `Supervisor: ${supervisorName}`
+              : "Assign Supervisor"}
           </button>
 
           <button className="px-4 py-2 bg-red-50 text-red-600 rounded-lg text-sm font-medium hover:bg-red-100 transition-colors w-fit">
@@ -197,9 +205,21 @@ export default function TeacherDetails({
 
             <div className="w-full flex flex-col gap-2">
               <div className="flex justify-between items-center py-2 border-t border-gray-100">
-                <span className="text-sm text-gray-500">Price / Session</span>
+                <span className="text-sm text-gray-500">Price / Hour</span>
                 <span className="text-sm font-semibold text-[#1A2B4C]">
-                  {price}
+                  {price}$
+                </span>
+              </div>
+              <div className="flex justify-between items-center py-2 border-t border-gray-100">
+                <span className="text-sm text-gray-500">Total Hours</span>
+                <span className="text-sm font-semibold text-[#1A2B4C]">
+                  {stats ? stats.totalHours.toFixed(2) : "—"} hrs
+                </span>
+              </div>
+              <div className="flex justify-between items-center py-2 border-t border-gray-100">
+                <span className="text-sm text-gray-500">Total Salary</span>
+                <span className="text-sm font-semibold text-green-600">
+                  ${stats ? (stats.totalSalaryCents / 100).toFixed(2) : "—"}
                 </span>
               </div>
               <div className="flex justify-between items-center py-2 border-t border-gray-100">
@@ -301,14 +321,22 @@ export default function TeacherDetails({
 
 // ── Helper ────────────────────────────────────────────────────────────────────
 
-function InfoRow({ icon, label, value, highlight = false }: { icon: React.ReactNode, label: string, value: React.ReactNode, highlight?: boolean }) {
+function InfoRow({
+  icon,
+  label,
+  value,
+  highlight = false,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  value: React.ReactNode;
+  highlight?: boolean;
+}) {
   return (
     <div className="flex items-start gap-4">
       <div
         className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${
-          highlight
-            ? "bg-[#1A2B4C] text-white"
-            : "bg-[#E6F1FB] text-[#0C447C]"
+          highlight ? "bg-[#1A2B4C] text-white" : "bg-[#E6F1FB] text-[#0C447C]"
         }`}
       >
         {icon}

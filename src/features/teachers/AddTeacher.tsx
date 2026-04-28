@@ -190,12 +190,15 @@ export function TeacherFormModal({ open, onOpenChange, teacher }: Props) {
 
           {/* Price */}
           <div className="space-y-2">
-            <Label htmlFor="price_per_hour">Price / Hour (cents)</Label>
+            <Label htmlFor="price_per_hour">Price / Hour</Label>
             <Input
               id="price_per_hour"
               type="number"
               min={0}
-              {...form.register("price_per_hour", { valueAsNumber: true, min: { value: 0, message: "Price cannot be negative" } })}
+              {...form.register("price_per_hour", {
+                valueAsNumber: true,
+                min: { value: 0, message: "Price cannot be negative" },
+              })}
               placeholder="2500"
             />
             <p className="text-xs text-muted-foreground">
