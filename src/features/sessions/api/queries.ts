@@ -41,15 +41,20 @@ export function useSession(id: string) {
   });
 }
 
+const isValidDate = (d: Date | null): d is Date =>
+  d !== null && !isNaN(d.getTime());
+
 export function useAvailableTeachers(start: Date | null, end: Date | null) {
+  const validStart = isValidDate(start);
+  const validEnd = isValidDate(end);
   return useQuery({
     queryKey: sessionKeys.availableTeachers(
-      start?.toISOString() ?? "",
-      end?.toISOString() ?? "",
+      validStart ? start.toISOString() : "",
+      validEnd ? end.toISOString() : "",
     ),
     queryFn: () =>
       getAvailableTeachers(start!.toISOString(), end!.toISOString()),
-    enabled: !!start && !!end,
+    enabled: validStart && validEnd,
   });
 }
 

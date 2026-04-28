@@ -123,8 +123,9 @@ export function ScheduleSessionModal({ open, onOpenChange }: Props) {
   }, [watchDate, debouncedTime]);
 
   const proposedEnd = useMemo(() => {
-    if (!proposedStart) return null;
-    return addMinutes(proposedStart, watchDuration);
+    if (!proposedStart || isNaN(watchDuration)) return null;
+    const end = addMinutes(proposedStart, watchDuration);
+    return isNaN(end.getTime()) ? null : end;
   }, [proposedStart, watchDuration]);
 
   const { data: availableTeachers = [], isLoading: loadingTeachers } =
