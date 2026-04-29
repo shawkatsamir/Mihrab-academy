@@ -90,7 +90,7 @@ export function SessionDetailClient({
 
       {/* ── Shared info ──────────────────────────────────────── */}
       <SessionHeader session={session} />
-      <ParticipantsBar session={session} />
+      <ParticipantsBar session={session} role={role} />
       {(session.status === "scheduled" || session.status === "live") && (
         <ZoomJoinSection session={session} />
       )}
