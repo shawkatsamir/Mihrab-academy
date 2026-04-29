@@ -3,10 +3,17 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ChevronLeft, ChevronRight, ChevronDown, ChevronUp, LifeBuoy } from "lucide-react";
+import {
+  ChevronLeft,
+  ChevronRight,
+  ChevronDown,
+  ChevronUp,
+  LifeBuoy,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import { getNavGroups, getPanelLabel } from "@/lib/auth/nav";
 import type { Database } from "@/lib/supabase/database.types";
+import { Img } from "../ui/Image";
 
 type UserRole = Database["public"]["Enums"]["user_role"];
 
@@ -42,8 +49,15 @@ export function Sidebar({ role }: SidebarProps) {
       {/* Header */}
       <div className="p-6 flex flex-col items-center border-b border-admin-border">
         <div className="flex items-center gap-3 w-full">
-          <div className="w-8 h-8 bg-admin-primary rounded flex items-center justify-center shrink-0">
-            <span className="text-white font-arabic font-bold text-lg leading-none">م</span>
+          <div className="w-8 h-8  flex items-center justify-center shrink-0">
+            <span className="text-white font-arabic font-bold text-lg leading-none">
+              <Img
+                src="/images/mihrab.jpeg"
+                alt="mihrab logo"
+                width={24}
+                height={24}
+              />
+            </span>
           </div>
           {!collapsed && (
             <div className="flex flex-col">
@@ -156,7 +170,9 @@ export function Sidebar({ role }: SidebarProps) {
                             : "text-admin-text-secondary",
                         )}
                       />
-                      {!collapsed && <span className="flex-1">{item.name}</span>}
+                      {!collapsed && (
+                        <span className="flex-1">{item.name}</span>
+                      )}
                       {!collapsed && item.badge && (
                         <span className="bg-admin-primary text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[18px] text-center">
                           {item.badge}

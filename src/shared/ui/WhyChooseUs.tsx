@@ -9,6 +9,10 @@ const benefits = [
     description: "Learn from scholars with authentic Ijazahs",
   },
   {
+    title: "Female Teachers Available",
+    description: "For girls with a high level of experience.",
+  },
+  {
     title: "Structured Curriculum",
     description: "Clear milestones and progress tracking",
   },
