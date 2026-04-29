@@ -1,19 +1,19 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { LogOut } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 
 export function LogoutButton() {
-  const router = useRouter();
   const [loading, setLoading] = useState(false);
 
   const handleLogout = async () => {
     setLoading(true);
     const supabase = createClient();
     await supabase.auth.signOut();
-    router.push("/auth/login");
+    // Full page navigation — prevents the browser from restoring this page
+    // from bfcache on back-navigation after logout.
+    window.location.href = "/auth/login";
   };
 
   return (
