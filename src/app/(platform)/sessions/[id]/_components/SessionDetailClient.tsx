@@ -13,19 +13,31 @@ import { MarkCompleteCard } from "@/features/sessions/components/MarkCompleteSec
 import type { EnrichedSessionRow } from "@/features/sessions/api/queries";
 
 const TeacherReportSection = dynamic(
-  () => import("@/features/sessions/components/TeacherReportSection").then((m) => ({ default: m.TeacherReportSection })),
+  () =>
+    import("@/features/sessions/components/TeacherReportSection").then((m) => ({
+      default: m.TeacherReportSection,
+    })),
   { ssr: false },
 );
 const ParentRatingSection = dynamic(
-  () => import("@/features/sessions/components/ParentRatingSection").then((m) => ({ default: m.ParentRatingSection })),
+  () =>
+    import("@/features/sessions/components/ParentRatingSection").then((m) => ({
+      default: m.ParentRatingSection,
+    })),
   { ssr: false },
 );
 const SupervisorEvalSection = dynamic(
-  () => import("@/features/sessions/components/SupervisorEvalSection").then((m) => ({ default: m.SupervisorEvalSection })),
+  () =>
+    import("@/features/sessions/components/SupervisorEvalSection").then(
+      (m) => ({ default: m.SupervisorEvalSection }),
+    ),
   { ssr: false },
 );
 const AdminEvalOverview = dynamic(
-  () => import("@/features/sessions/components/AdminEvalOverview").then((m) => ({ default: m.AdminEvalOverview })),
+  () =>
+    import("@/features/sessions/components/AdminEvalOverview").then((m) => ({
+      default: m.AdminEvalOverview,
+    })),
   { ssr: false },
 );
 
@@ -33,9 +45,17 @@ interface Props {
   session: EnrichedSessionRow;
   role: "admin" | "supervisor" | "teacher" | "student";
   userId: string;
-  teacherEval: { is_visible_to_parent?: boolean | null; categories?: unknown; notes_md?: string | null; } | null;
-  supervisorEval: { rating?: number | null; notes_md?: string | null; } | null;
-  parentRating: { rating?: number | null; comment?: string | null; submitted_at?: string | null; } | null;
+  teacherEval: {
+    is_visible_to_parent?: boolean | null;
+    categories?: unknown;
+    notes_md?: string | null;
+  } | null;
+  supervisorEval: { rating?: number | null; notes_md?: string | null } | null;
+  parentRating: {
+    rating?: number | null;
+    comment?: string | null;
+    submitted_at?: string | null;
+  } | null;
 }
 
 export function SessionDetailClient({
@@ -47,7 +67,8 @@ export function SessionDetailClient({
   parentRating,
 }: Props) {
   const [localTeacherEval, setLocalTeacherEval] = useState(teacherEval);
-  const [localSupervisorEval, setLocalSupervisorEval] = useState(supervisorEval);
+  const [localSupervisorEval, setLocalSupervisorEval] =
+    useState(supervisorEval);
   const [localParentRating, setLocalParentRating] = useState(parentRating);
 
   const isAdmin = role === "admin";
@@ -100,7 +121,15 @@ export function SessionDetailClient({
           {/* Read-only once saved for the first time */}
           <TeacherReportSection
             session={session}
-            existingEval={localTeacherEval as { is_visible_to_parent?: boolean; categories?: { category: string; score: number }[]; notes_md?: string; } | undefined}
+            existingEval={
+              localTeacherEval as
+                | {
+                    is_visible_to_parent?: boolean;
+                    categories?: { category: string; score: number }[];
+                    notes_md?: string;
+                  }
+                | undefined
+            }
             readOnly={!!localTeacherEval}
             onSaved={setLocalTeacherEval}
           />
@@ -108,13 +137,6 @@ export function SessionDetailClient({
             <SupervisorEvalSection
               session={session}
               existingEval={localSupervisorEval ?? undefined}
-              readOnly
-            />
-          )}
-          {localParentRating && (
-            <ParentRatingSection
-              session={session}
-              existingRating={localParentRating ?? undefined}
               readOnly
             />
           )}
@@ -160,7 +182,15 @@ export function SessionDetailClient({
           {localTeacherEval?.is_visible_to_parent && (
             <TeacherReportSection
               session={session}
-              existingEval={localTeacherEval as { is_visible_to_parent?: boolean; categories?: { category: string; score: number }[]; notes_md?: string; } | undefined}
+              existingEval={
+                localTeacherEval as
+                  | {
+                      is_visible_to_parent?: boolean;
+                      categories?: { category: string; score: number }[];
+                      notes_md?: string;
+                    }
+                  | undefined
+              }
               readOnly
             />
           )}
