@@ -62,9 +62,9 @@ export async function autoCompleteStaleSessions() {
         { onConflict: "session_id" },
       );
 
-    // Accrue salary — same logic as manual completion
+    // Prorate by actual session duration: (minutes / 60) * hourly_rate
     const priceInDollars = s.teachers?.price_per_hour ?? 0;
-    const amountCents = Math.round(priceInDollars * 100);
+    const amountCents = Math.round(((s.duration_minutes ?? 0) / 60) * priceInDollars * 100);
 
     if (amountCents > 0) {
       const { error: earnErr } = await supabaseAdmin
