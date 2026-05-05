@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Img } from "@/shared/ui/Image";
 import { Calendar } from "lucide-react";
+import { ResendInviteButton } from "@/components/ResendInviteButton";
 
 export interface Student {
   id: string | number;
@@ -100,6 +101,7 @@ export function StudentCard({ student, onEdit }: StudentCardProps) {
           View profile
         </Link>
         <div className="flex items-center gap-2">
+          <ResendInviteButton userId={String(student.id)} />
           {onEdit && (
             <button
               onClick={onEdit}

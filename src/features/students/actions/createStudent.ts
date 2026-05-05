@@ -3,6 +3,7 @@
 import { createClient as createSupabaseClient } from "@supabase/supabase-js";
 import { revalidatePath } from "next/cache";
 import { requireRole } from "@/lib/auth/getAuthenticatedUser";
+import { sendInvitationEmail } from "@/lib/email/sendInvitationEmail";
 import type { Database } from "@/lib/supabase/database.types";
 
 const supabaseAdmin = createSupabaseClient<Database>(
@@ -56,11 +57,8 @@ export async function createStudent(formData: FormData) {
 
   if (studentErr) throw new Error(studentErr.message);
 
-  // 4. Send invitation email
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
-  await supabaseAdmin.auth.resetPasswordForEmail(parentEmail, {
-    redirectTo: `${siteUrl}/auth/confirm?next=/auth/update-password`,
-  });
+  // 4. Send invitation email via Resend (bypasses Gmail pre-scanning that would consume the OTP)
+  await sendInvitationEmail({ email: parentEmail, fullName });
 
   revalidatePath("/students");
   return { success: true, userId };

@@ -17,6 +17,7 @@ import {
 } from "@/features/teachers/api/queries";
 import { Img } from "@/shared/ui/Image";
 import { useRouter } from "next/navigation";
+import { ResendInviteButton } from "@/components/ResendInviteButton";
 
 interface Props {
   teachers: TeacherWithProfile[];
@@ -46,13 +47,14 @@ export function TeachersTable({ teachers, isLoading }: Props) {
             <TableHead>Status</TableHead>
             <TableHead>Price / Hour</TableHead>
             <TableHead>Joined</TableHead>
+            <TableHead />
           </TableRow>
         </TableHeader>
         <TableBody>
           {teachers.length === 0 && (
             <TableRow>
               <TableCell
-                colSpan={5}
+                colSpan={6}
                 className="text-center text-muted-foreground py-8"
               >
                 No teachers found.
@@ -139,6 +141,11 @@ export function TeachersTable({ teachers, isLoading }: Props) {
                   {t.profiles?.created_at
                     ? format(new Date(t.profiles.created_at), "MMM d, yyyy")
                     : "—"}
+                </TableCell>
+
+                {/* Actions */}
+                <TableCell>
+                  <ResendInviteButton userId={t.id} />
                 </TableCell>
               </TableRow>
             );

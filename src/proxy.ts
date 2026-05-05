@@ -18,7 +18,7 @@ const ROUTE_GUARDS: { pattern: RegExp; roles: UserRole[] }[] = [
   { pattern: /^\/supervisor/, roles: ["admin", "supervisor"] },
   { pattern: /^\/teacher/, roles: ["admin", "supervisor", "teacher"] },
   { pattern: /^\/student/, roles: ["admin", "student"] },
-  { pattern: /^\/sessions/, roles: ["admin", "supervisor", "teacher"] },
+  { pattern: /^\/sessions/, roles: ["admin", "supervisor", "teacher", "student"] },
   { pattern: /^\/calendar/, roles: ["admin", "supervisor", "teacher", "student"] },
   { pattern: /^\/dashboard/, roles: ["admin", "supervisor", "teacher", "student"] },
 ];

@@ -14,6 +14,7 @@ import { Skeleton } from "@/shared/ui/Skeleton";
 import { type SupervisorWithProfile } from "@/features/supervisors/api/queries";
 import { Img } from "@/shared/ui/Image";
 import { useRouter } from "next/navigation";
+import { ResendInviteButton } from "@/components/ResendInviteButton";
 
 interface Props {
   supervisors: SupervisorWithProfile[];
@@ -43,13 +44,14 @@ export function SupervisorsTable({ supervisors, isLoading }: Props) {
             <TableHead>Supervisor</TableHead>
             <TableHead>Status</TableHead>
             <TableHead>Joined</TableHead>
+            <TableHead />
           </TableRow>
         </TableHeader>
         <TableBody>
           {supervisors.length === 0 && (
             <TableRow>
               <TableCell
-                colSpan={3}
+                colSpan={4}
                 className="text-center text-muted-foreground py-8"
               >
                 No supervisors found.
@@ -106,6 +108,11 @@ export function SupervisorsTable({ supervisors, isLoading }: Props) {
                   {s.profiles?.created_at
                     ? format(new Date(s.profiles.created_at), "MMM d, yyyy")
                     : "-"}
+                </TableCell>
+
+                {/* Actions */}
+                <TableCell>
+                  <ResendInviteButton userId={s.id} />
                 </TableCell>
               </TableRow>
             );
