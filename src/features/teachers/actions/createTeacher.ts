@@ -86,6 +86,12 @@ export async function createTeacher(formData: FormData) {
 
   if (teacherErr) throw new Error(teacherErr.message);
 
+  // 5. Send invitation email so the teacher can set their own password on first login
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+  await supabaseAdmin.auth.resetPasswordForEmail(email, {
+    redirectTo: `${siteUrl}/auth/confirm?next=/auth/update-password`,
+  });
+
   revalidatePath("/teachers");
   return { success: true, userId: authData.user.id };
 }
