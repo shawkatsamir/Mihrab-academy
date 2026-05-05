@@ -4,6 +4,7 @@ import { createClient as createSupabaseClient } from "@supabase/supabase-js";
 import { revalidatePath } from "next/cache";
 import type { Database } from "@/lib/supabase/database.types";
 import { requireRole } from "@/lib/auth/getAuthenticatedUser";
+import { sendInvitationEmail } from "@/lib/email/sendInvitationEmail";
 
 const supabaseAdmin = createSupabaseClient<Database>(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -81,11 +82,8 @@ export async function createSupervisor(formData: FormData) {
 
   if (supervisorErr) throw new Error(supervisorErr.message);
 
-  // 5. Send invitation email so the supervisor can set their own password on first login
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
-  await supabaseAdmin.auth.resetPasswordForEmail(email, {
-    redirectTo: `${siteUrl}/auth/confirm?next=/auth/update-password`,
-  });
+  // 5. Send invitation email via Resend (bypasses Gmail pre-scanning that would consume the OTP)
+  await sendInvitationEmail({ email, fullName });
 
   revalidatePath("/supervisors");
   return { success: true, userId: authData.user.id };
