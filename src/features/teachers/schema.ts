@@ -8,7 +8,7 @@ export const teacherFormSchema = z.object({
     .min(0, "Price cannot be negative")
     .int("Price must be a whole number (cents)"),
   bio: z.string().max(500, "Bio too long").optional(),
-  zoom_personal_link: z.string().url("Invalid URL").optional().or(z.literal("")),
+  zoom_personal_link: z.string().url("Please enter a valid Zoom personal link URL"),
 });
 
 export type TeacherFormValues = z.infer<typeof teacherFormSchema>;

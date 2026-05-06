@@ -350,7 +350,14 @@ export function ScheduleSessionModal({ open, onOpenChange }: Props) {
               <div className="space-y-2">
                 <Select
                   value={form.watch("teacher_id")}
-                  onValueChange={(v) => form.setValue("teacher_id", v)}
+                  onValueChange={(v) => {
+                    form.setValue("teacher_id", v);
+                    // Auto-fill zoom URL from the selected teacher's personal link
+                    const teacher = availableTeachers.find((t) => t.id === v);
+                    if (teacher?.zoom_personal_link) {
+                      form.setValue("zoom_join_url", teacher.zoom_personal_link);
+                    }
+                  }}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Select available teacher" />
