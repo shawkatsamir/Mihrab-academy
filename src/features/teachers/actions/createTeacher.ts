@@ -82,6 +82,7 @@ export async function createTeacher(formData: FormData) {
     id: authData.user.id,
     bio,
     price_per_hour: pricePerHour,
+    sogo_email: email,
     zoom_personal_link: zoomPersonalLink,
   });
 

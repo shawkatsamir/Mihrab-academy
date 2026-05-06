@@ -7,9 +7,6 @@ import { format } from "date-fns";
 import {
   ArrowLeft,
   Mail,
-  Phone,
-  Calendar,
-  User,
   Video,
   UserCheck,
   Shield,
@@ -54,18 +51,6 @@ const TeacherPerformance = dynamic(
   },
 );
 
-// ── Remaining mock data (will be replaced gradually) ──────────────────────────
-const teacherData = {
-  idNumber: "T-1003",
-  employmentType: "Full-Time",
-  gender: "Male",
-  dob: "April 15, 1990",
-  email: "omar.s@miharab.com",
-  phone: "+1 234 567 8900",
-  zoomUrl: "https://zoom.us/j/9876543210",
-};
-
-// ─────────────────────────────────────────────────────────────────────────────
 
 export default function TeacherDetails({
   params,
@@ -195,11 +180,8 @@ export default function TeacherDetails({
               {fullName}
             </h2>
             <div className="flex gap-2 mb-6">
-              <span className="px-2.5 py-1 bg-gray-50 border border-gray-200 rounded-md text-xs font-medium text-gray-600">
-                {teacherData.idNumber}
-              </span>
               <span className="px-2.5 py-1 bg-[#E6F1FB] text-[#0C447C] rounded-md text-xs font-medium">
-                {teacherData.employmentType}
+                {teacher.profiles?.is_active ? "Active" : "Inactive"}
               </span>
             </div>
 
@@ -277,37 +259,24 @@ export default function TeacherDetails({
                 icon={<Video className="w-5 h-5" />}
                 label="Zoom Meeting URL"
                 value={
-                  <a
-                    href={teacherData.zoomUrl}
-                    target="_blank"
-                    className="text-blue-600 hover:underline break-all"
-                  >
-                    {teacherData.zoomUrl}
-                  </a>
+                  teacher.zoom_personal_link ? (
+                    <a
+                      href={teacher.zoom_personal_link}
+                      target="_blank"
+                      className="text-blue-600 hover:underline break-all"
+                    >
+                      {teacher.zoom_personal_link}
+                    </a>
+                  ) : (
+                    "—"
+                  )
                 }
               />
 
-              <div className="border-t border-gray-100 my-4" />
-
-              <InfoRow
-                icon={<User className="w-5 h-5" />}
-                label="Gender"
-                value={teacherData.gender}
-              />
-              <InfoRow
-                icon={<Calendar className="w-5 h-5" />}
-                label="Date of Birth"
-                value={teacherData.dob}
-              />
               <InfoRow
                 icon={<Mail className="w-5 h-5" />}
                 label="Email Address"
-                value={teacherData.email}
-              />
-              <InfoRow
-                icon={<Phone className="w-5 h-5" />}
-                label="Phone Number"
-                value={teacherData.phone}
+                value={teacher.sogo_email ?? "—"}
               />
             </div>
           </div>

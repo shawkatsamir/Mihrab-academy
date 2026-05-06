@@ -85,8 +85,7 @@ export function TeacherFormModal({ open, onOpenChange, teacher }: Props) {
         formData.append("email", (values as TeacherFormValues).email);
         formData.append("price_per_hour", String(values.price_per_hour));
         if (values.bio) formData.append("bio", values.bio);
-        if (values.zoom_personal_link)
-          formData.append("zoom_personal_link", values.zoom_personal_link);
+        formData.append("zoom_personal_link", values.zoom_personal_link ?? "");
         if (imageFile) formData.append("image", imageFile);
 
         await createTeacher(formData);
@@ -213,7 +212,9 @@ export function TeacherFormModal({ open, onOpenChange, teacher }: Props) {
 
           {/* Zoom URL */}
           <div className="space-y-2">
-            <Label htmlFor="zoom_personal_link">Zoom Personal Link</Label>
+            <Label htmlFor="zoom_personal_link">
+              Zoom Personal Link <span className="text-red-500">*</span>
+            </Label>
             <Input
               id="zoom_personal_link"
               type="url"
