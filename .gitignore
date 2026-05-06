@@ -12,6 +12,8 @@
 
 # testing
 /coverage
+/test-results/
+*.png
 
 # next.js
 /.next/
@@ -40,3 +42,10 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 .env.sentry-build-plugin
+
+# claude — track skills (shared), ignore local settings and personal memory
+/.claude/settings.local.json
+/.claude/memory/
+
+# playwright-cli workspace (generated artifacts)
+/.playwright-cli/
