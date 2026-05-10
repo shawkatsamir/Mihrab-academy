@@ -15,6 +15,7 @@ const BASE64_PREFIX = "base64-";
 
 const ROUTE_GUARDS: { pattern: RegExp; roles: UserRole[] }[] = [
   { pattern: /^\/admin/, roles: ["admin"] },
+  { pattern: /^\/studio/, roles: ["admin"] },
   { pattern: /^\/supervisor/, roles: ["admin", "supervisor"] },
   { pattern: /^\/teacher/, roles: ["admin", "supervisor", "teacher"] },
   { pattern: /^\/student/, roles: ["admin", "student"] },
@@ -104,6 +105,7 @@ export function proxy(request: NextRequest) {
     "/profile",
     "/sessions",
     "/student",
+    "/studio",
     "/teachers",
   ];
   if (!platformRoutes.some((route) => pathname.startsWith(route))) return response;
