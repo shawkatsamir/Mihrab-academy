@@ -1,8 +1,9 @@
 import { createClient } from "next-sanity";
+import { apiVersion, dataset, projectId } from "../env";
 
 export const sanityClient = createClient({
-  projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID!,
-  dataset: process.env.NEXT_PUBLIC_SANITY_DATASET ?? "production",
-  apiVersion: "2025-02-19",
+  projectId,
+  dataset,
+  apiVersion,
   useCdn: process.env.NODE_ENV === "production", // use CDN in prod, live API in dev
 });
