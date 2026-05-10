@@ -33,5 +33,9 @@ export async function POST(request: NextRequest) {
     revalidatePath("/blog/[slug]", "page");
   }
 
-  return Response.json({ revalidated: true, slug: slug ?? "all", at: new Date().toISOString() });
+  return Response.json({
+    revalidated: true,
+    slug: slug ?? "all",
+    at: new Date().toISOString(),
+  });
 }
