@@ -25,7 +25,7 @@ export function LoginForm({
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const supabase = createClient();
     setIsLoading(true);
@@ -39,7 +39,11 @@ export function LoginForm({
       if (error) throw error;
       // Full page load — ensures middleware + server components see the new session cookies.
       // router.push() does a soft navigation that skips middleware cookie refresh.
-      window.location.href = "/dashboard";
+      const next = new URLSearchParams(window.location.search).get("next");
+      // Only follow relative paths to prevent open-redirect attacks.
+      const destination =
+        next && next.startsWith("/") ? next : "/dashboard";
+      window.location.href = destination;
     } catch (error: unknown) {
       setError(error instanceof Error ? error.message : "An error occurred");
     } finally {
