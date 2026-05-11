@@ -3,6 +3,7 @@ import { sanityClient } from "@/sanity/lib/client";
 import { ALL_POSTS_QUERY } from "@/sanity/lib/queries";
 import { urlFor } from "@/sanity/lib/image";
 import type { Metadata } from "next";
+import BlogHero from "./_components/BlogHero";
 
 type HeroImage = {
   asset: { _ref: string; _type: string };
@@ -32,9 +33,10 @@ export default async function BlogPage() {
   const posts = await sanityClient.fetch(ALL_POSTS_QUERY);
 
   return (
-    <main className="max-w-5xl mx-auto px-4 py-12">
-      <h1 className="text-3xl font-semibold mb-8">Blog</h1>
+    <main>
+      <BlogHero />
 
+      <div className="max-w-5xl mx-auto px-4 py-12">
       {posts.length === 0 ? (
         <p className="text-gray-500">No posts published yet.</p>
       ) : (
@@ -92,6 +94,7 @@ export default async function BlogPage() {
           ))}
         </div>
       )}
+      </div>
     </main>
   );
 }

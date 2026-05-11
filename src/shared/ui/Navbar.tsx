@@ -4,6 +4,7 @@ import { useState } from "react";
 
 import { Menu, X } from "lucide-react";
 import { motion } from "motion/react";
+import Link from "next/link";
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -25,30 +26,18 @@ export default function Navbar() {
 
         {/* Desktop Links */}
         <div className="hidden lg:flex items-center gap-6 lg:gap-8 text-white/90 font-medium whitespace-nowrap">
-          <a href="#" className="hover:text-mihrab-gold transition-colors">
+          <Link href="/" className="hover:text-mihrab-gold transition-colors">
             Home
-          </a>
-          <a
-            href="#courses"
-            className="hover:text-mihrab-gold transition-colors"
-          >
+          </Link>
+          <Link href="/#courses" className="hover:text-mihrab-gold transition-colors">
             Courses
-          </a>
-          <a href="#about" className="hover:text-mihrab-gold transition-colors">
+          </Link>
+          <Link href="/#about" className="hover:text-mihrab-gold transition-colors">
             About Us
-          </a>
-          <a
-            href="#teachers"
-            className="hover:text-mihrab-gold transition-colors"
-          >
-            Teachers
-          </a>
-          <a
-            href="#contact"
-            className="hover:text-mihrab-gold transition-colors"
-          >
-            Contact
-          </a>
+          </Link>
+          <Link href="/blog" className="hover:text-mihrab-gold transition-colors">
+            Blog
+          </Link>
         </div>
 
         {/* CTA Button */}
@@ -70,41 +59,48 @@ export default function Navbar() {
       {/* Mobile Menu */}
       {isOpen && (
         <div className="lg:hidden absolute top-full left-0 right-0 bg-mihrab-green border-t border-white/10 p-4 flex flex-col gap-4 shadow-xl">
-          <a
-            href="#"
+          <Link
+            href="/"
             onClick={() => setIsOpen(false)}
             className="text-white hover:text-mihrab-gold px-4 py-2"
           >
             Home
-          </a>
-          <a
-            href="#courses"
+          </Link>
+          <Link
+            href="/#courses"
             onClick={() => setIsOpen(false)}
             className="text-white hover:text-mihrab-gold px-4 py-2"
           >
             Courses
-          </a>
-          <a
-            href="#about"
+          </Link>
+          <Link
+            href="/#about"
             onClick={() => setIsOpen(false)}
             className="text-white hover:text-mihrab-gold px-4 py-2"
           >
             About Us
-          </a>
-          <a
-            href="#teachers"
+          </Link>
+          <Link
+            href="/#teachers"
             onClick={() => setIsOpen(false)}
             className="text-white hover:text-mihrab-gold px-4 py-2"
           >
             Teachers
-          </a>
-          <a
-            href="#contact"
+          </Link>
+          <Link
+            href="/#contact"
             onClick={() => setIsOpen(false)}
             className="text-white hover:text-mihrab-gold px-4 py-2"
           >
             Contact
-          </a>
+          </Link>
+          <Link
+            href="/blog"
+            onClick={() => setIsOpen(false)}
+            className="text-white hover:text-mihrab-gold px-4 py-2"
+          >
+            Blog
+          </Link>
           <button className="bg-mihrab-gold text-mihrab-green font-semibold px-6 py-2 rounded-full mt-2 w-full">
             Start Learning
           </button>
