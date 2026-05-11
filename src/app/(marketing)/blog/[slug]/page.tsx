@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { sanityClient } from "@/sanity/lib/client";
 import { POST_BY_SLUG_QUERY } from "@/sanity/lib/queries";
+import { urlFor } from "@/sanity/lib/image";
 import { PortableText } from "@portabletext/react";
 import { portableTextComponents } from "@/sanity/components/PortableTextComponents";
 import type { Metadata } from "next";
@@ -43,10 +44,60 @@ export default async function PostPage({ params }: Props) {
   if (!post) notFound();
 
   return (
-    <article className="prose prose-gray prose-lg max-w-3xl mx-auto px-4 py-10 prose-headings:font-semibold prose-a:text-teal-600 prose-a:no-underline hover:prose-a:underline prose-blockquote:border-l-teal-400 prose-blockquote:text-gray-600">
-      <h1>{post.title}</h1>
-      <PortableText value={post.body} components={portableTextComponents} />
-    </article>
+    <div className="min-h-screen">
+      <div className="max-w-3xl mx-auto px-4 py-8 md:py-12">
+        {/* Hero image */}
+        {post.heroImage?.asset && (
+          <div className="mb-8 rounded-xl overflow-hidden aspect-video">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={urlFor(post.heroImage).width(1200).height(630).auto("format").url()}
+              alt={post.heroImage.alt ?? post.title}
+              className="w-full h-full object-cover"
+            />
+          </div>
+        )}
+        {/* Post header */}
+        <header className="mb-8 border-b border-gray-100 pb-6">
+          {post.category && (
+            <span className="text-xs font-semibold uppercase tracking-widest text-teal-600">
+              {post.category.title}
+            </span>
+          )}
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mt-2 mb-4 leading-tight">
+            {post.title}
+          </h1>
+          <div className="flex flex-wrap items-center gap-2 text-sm text-gray-500">
+            {post.author?.name && (
+              <span className="font-medium text-gray-700">{post.author.name}</span>
+            )}
+            {post.publishedAt && (
+              <>
+                {post.author?.name && <span>·</span>}
+                <time dateTime={post.publishedAt}>
+                  {new Date(post.publishedAt).toLocaleDateString("en-GB", {
+                    day: "numeric",
+                    month: "long",
+                    year: "numeric",
+                  })}
+                </time>
+              </>
+            )}
+            {post.readingTime && (
+              <>
+                <span>·</span>
+                <span>{post.readingTime} min read</span>
+              </>
+            )}
+          </div>
+        </header>
+
+        {/* Post body */}
+        <article className="prose prose-gray prose-sm sm:prose-base lg:prose-lg prose-headings:font-semibold prose-a:text-teal-600 prose-a:no-underline hover:prose-a:underline prose-blockquote:border-l-teal-400 prose-blockquote:text-gray-600 prose-img:rounded-xl max-w-none">
+          <PortableText value={post.body} components={portableTextComponents} />
+        </article>
+      </div>
+    </div>
   );
 }
 
