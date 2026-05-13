@@ -64,6 +64,18 @@ export const FEATURED_POSTS_QUERY = groq`
   }
 `;
 
+// Latest posts for landing page preview (max 3)
+export const LATEST_POSTS_QUERY = groq`
+  *[_type == "post" && !seo.noIndex] | order(publishedAt desc)[0...3] {
+    _id,
+    title,
+    slug,
+    excerpt,
+    heroImage { asset->, alt },
+    category->{ title }
+  }
+`;
+
 // Posts by category
 export const POSTS_BY_CATEGORY_QUERY = groq`
   *[_type == "post" && category->slug.current == $category] | order(publishedAt desc) {

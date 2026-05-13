@@ -4,7 +4,9 @@ type UserRole = "admin" | "supervisor" | "teacher" | "student";
 
 // @supabase/ssr derives the storage key from the Supabase project URL hostname.
 // e.g. https://xigclanmppbtrwuocvub.supabase.co → sb-xigclanmppbtrwuocvub-auth-token
-const PROJECT_REF = new URL(process.env.NEXT_PUBLIC_SUPABASE_URL!).hostname.split(".")[0];
+const PROJECT_REF = new URL(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+).hostname.split(".")[0];
 const AUTH_COOKIE = `sb-${PROJECT_REF}-auth-token`;
 
 // createBrowserClient defaults cookieEncoding to "base64url", so every stored
@@ -19,9 +21,18 @@ const ROUTE_GUARDS: { pattern: RegExp; roles: UserRole[] }[] = [
   { pattern: /^\/supervisor/, roles: ["admin", "supervisor"] },
   { pattern: /^\/teacher/, roles: ["admin", "supervisor", "teacher"] },
   { pattern: /^\/student/, roles: ["admin", "student"] },
-  { pattern: /^\/sessions/, roles: ["admin", "supervisor", "teacher", "student"] },
-  { pattern: /^\/calendar/, roles: ["admin", "supervisor", "teacher", "student"] },
-  { pattern: /^\/dashboard/, roles: ["admin", "supervisor", "teacher", "student"] },
+  {
+    pattern: /^\/sessions/,
+    roles: ["admin", "supervisor", "teacher", "student"],
+  },
+  {
+    pattern: /^\/calendar/,
+    roles: ["admin", "supervisor", "teacher", "student"],
+  },
+  {
+    pattern: /^\/dashboard/,
+    roles: ["admin", "supervisor", "teacher", "student"],
+  },
 ];
 
 // Decode a base64url string (RFC 4648 §5) to a UTF-8 string.
@@ -108,7 +119,8 @@ export function proxy(request: NextRequest) {
     "/studio",
     "/teachers",
   ];
-  if (!platformRoutes.some((route) => pathname.startsWith(route))) return response;
+  if (!platformRoutes.some((route) => pathname.startsWith(route)))
+    return response;
 
   const payload = getAuthPayload(request);
   if (!payload) {
