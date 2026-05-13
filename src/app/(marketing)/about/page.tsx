@@ -148,7 +148,7 @@ export default function AboutPage() {
               </div>
               <div className="border-t border-gray-100 pt-5">
                 <p className="text-mihrab-green font-medium text-sm italic">
-                  "We strive to provide the best possible Quranic and Arabic education to students all around the world — from children as young as four to adult learners."
+                  &ldquo;We strive to provide the best possible Quranic and Arabic education to students all around the world — from children as young as four to adult learners.&rdquo;
                 </p>
               </div>
             </motion.div>
@@ -165,7 +165,7 @@ export default function AboutPage() {
               </div>
               <div className="border-t border-white/10 pt-5">
                 <p className="text-mihrab-gold font-medium text-sm italic">
-                  "With Mihrab Academy, we bring a positive, stimulating learning experience for all levels — helping every student build self-respect, motivation, and a lifelong love of knowledge."
+                  &ldquo;With Mihrab Academy, we bring a positive, stimulating learning experience for all levels — helping every student build self-respect, motivation, and a lifelong love of knowledge.&rdquo;
                 </p>
               </div>
             </motion.div>
