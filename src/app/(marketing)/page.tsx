@@ -4,6 +4,7 @@ import Footer from "@/shared/ui/Footer";
 import Hero from "@/shared/ui/Hero";
 import Navbar from "@/shared/ui/Navbar";
 import Programs from "@/shared/ui/Programs";
+import TrialPopup from "@/shared/ui/TrialPopup";
 import Vision from "@/shared/ui/Vision";
 import WhyChooseUs from "@/shared/ui/WhyChooseUs";
 import { sanityClient } from "@/sanity/lib/client";
@@ -44,6 +45,7 @@ export default async function Page() {
         <Contact />
       </main>
       <Footer />
+      <TrialPopup />
     </div>
   );
 }
