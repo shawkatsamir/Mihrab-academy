@@ -32,7 +32,7 @@ export default function Navbar() {
           <Link href="/#courses" className="hover:text-mihrab-gold transition-colors">
             Courses
           </Link>
-          <Link href="/#about" className="hover:text-mihrab-gold transition-colors">
+          <Link href="/about" className="hover:text-mihrab-gold transition-colors">
             About Us
           </Link>
           <Link href="/blog" className="hover:text-mihrab-gold transition-colors">
@@ -74,7 +74,7 @@ export default function Navbar() {
             Courses
           </Link>
           <Link
-            href="/#about"
+            href="/about"
             onClick={() => setIsOpen(false)}
             className="text-white hover:text-mihrab-gold px-4 py-2"
           >
